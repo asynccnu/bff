@@ -1,0 +1,260 @@
+package class
+
+import (
+	cs "github.com/asynccnu/be-api/gen/proto/classService/v1"
+	classlistv1 "github.com/asynccnu/be-api/gen/proto/classlist/v1"
+	"github.com/asynccnu/bff/errs"
+	"github.com/asynccnu/bff/pkg/ginx"
+	"github.com/asynccnu/bff/web"
+	"github.com/asynccnu/bff/web/ijwt"
+	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/copier"
+)
+
+type ClassHandler struct {
+	ClassListClient    classlistv1.ClasserClient
+	ClassServiceClinet cs.ClassServiceClient
+	Administrators     map[string]struct{} //这里注入的是管理员权限验证配置
+}
+
+func NewClassListHandler(
+	ClassListClient classlistv1.ClasserClient,
+	ClassServiceClinet cs.ClassServiceClient,
+	administrators map[string]struct{}) *ClassHandler {
+	return &ClassHandler{
+		ClassListClient:    ClassListClient,
+		ClassServiceClinet: ClassServiceClinet,
+		Administrators:     administrators,
+	}
+}
+
+func (c *ClassHandler) RegisterRoutes(s *gin.Engine, authMiddleware gin.HandlerFunc) {
+	sg := s.Group("/class")
+	sg.GET("/get", authMiddleware, ginx.WrapClaimsAndReq(c.GetClassList))
+	sg.POST("/add", authMiddleware, ginx.WrapClaimsAndReq(c.AddClass))
+	sg.DELETE("/delete", authMiddleware, ginx.WrapClaimsAndReq(c.DeleteClass))
+	sg.PUT("/update", authMiddleware, ginx.WrapClaimsAndReq(c.UpdateClass))
+	sg.GET("/getRecycle", authMiddleware, ginx.WrapClaimsAndReq(c.GetRecycleBinClassInfos))
+	sg.PUT("/recover", authMiddleware, ginx.WrapClaimsAndReq(c.RecoverClass))
+	sg.GET("/search", authMiddleware, ginx.WrapReq(c.SearchClass))
+}
+
+// GetClassList 获取课表
+// @Summary 获取课表
+// @Description 根据学期、学年等条件获取课表
+// @Tags 课表
+// @Param year query string true "学年"
+// @Param semester query string true "学期"
+// @Param week query int true "当前周"
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Param request body GetClassListRequest true "获取课表请求参数"
+// @Success 200 {object} web.Response{data=GetClassListResp} "成功返回课表"
+// @Router /class/get [get]
+func (c *ClassHandler) GetClassList(ctx *gin.Context, req GetClassListRequest, uc ijwt.UserClaims) (web.Response, error) {
+
+	classes, err := c.ClassListClient.GetClass(ctx, &classlistv1.GetClassRequest{
+		Week:     req.Week,
+		StuId:    uc.StudentId,
+		Semester: req.Semester,
+		Year:     req.Year,
+	})
+	if err != nil {
+		return web.Response{}, errs.GET_CLASS_LIST_ERROR(err)
+	}
+	var resp GetClassListResp
+	err = copier.Copy(&resp.Classes, &classes.Classes)
+	if err != nil {
+		return web.Response{
+			Code: errs.INTERNAL_SERVER_ERROR_CODE,
+			Msg:  "系统异常",
+		}, errs.TYPE_CHANGE_ERROR(err)
+	}
+	return web.Response{
+		Msg:  "Success",
+		Data: resp,
+	}, nil
+}
+
+// AddClass 添加课表
+// @Summary 添加课表
+// @Description 添加新的课表
+// @Tags 课表
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Param body body AddClassRequest true "课表信息"
+// @Success 200 {object} web.Response "成功添加课表"
+// @Router /class/add [post]
+func (c *ClassHandler) AddClass(ctx *gin.Context, req AddClassRequest, uc ijwt.UserClaims) (web.Response, error) {
+	var preq = &cs.AddClassRequest{
+		StuId:    uc.StudentId,
+		Name:     req.Name,
+		DurClass: req.DurClass,
+		Where:    req.Where,
+		Teacher:  req.Where,
+		Weeks:    req.Weeks,
+		Semester: req.Semester,
+		Year:     req.Year,
+		Day:      req.Day,
+		Credit:   req.Credit,
+	}
+
+	_, err := c.ClassServiceClinet.AddClass(ctx, preq)
+	if err != nil {
+		return web.Response{}, errs.ADD_CLASS_ERROR(err)
+	}
+	return web.Response{
+		Msg: "Success",
+	}, nil
+}
+
+// DeleteClass 删除课表
+// @Summary 删除课表
+// @Description 根据课表ID删除课表
+// @Tags 课表
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Param body body DeleteClassRequest true "删除课表请求"
+// @Success 200 {object} web.Response "成功删除课表"
+// @Router /class/delete [delete]
+func (c *ClassHandler) DeleteClass(ctx *gin.Context, req DeleteClassRequest, uc ijwt.UserClaims) (web.Response, error) {
+	_, err := c.ClassListClient.DeleteClass(ctx, &classlistv1.DeleteClassRequest{
+		Id:       req.Id,
+		StuId:    uc.StudentId,
+		Year:     req.Year,
+		Semester: req.Semester,
+	})
+	if err != nil {
+		return web.Response{}, errs.DELETE_CLASS_ERROR(err)
+	}
+	return web.Response{
+		Msg: "Success",
+	}, nil
+}
+
+// UpdateClass 更新课表信息
+// @Summary 更新课表信息
+// @Description 根据课表ID更新课表信息
+// @Tags 课表
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Param body body UpdateClassRequest true "更新课表请求"
+// @Success 200 {object} web.Response "成功更新课表"
+// @Router /class/update [put]
+func (c *ClassHandler) UpdateClass(ctx *gin.Context, req UpdateClassRequest, uc ijwt.UserClaims) (web.Response, error) {
+	var preq = &classlistv1.UpdateClassRequest{
+		ClassId:  req.ClassId,
+		StuId:    uc.StudentId,
+		Name:     req.Name,
+		DurClass: req.DurClass,
+		Where:    req.Where,
+		Teacher:  req.Where,
+		Weeks:    req.Weeks,
+		Semester: req.Semester,
+		Year:     req.Year,
+		Day:      req.Day,
+		Credit:   req.Credit,
+	}
+
+	_, err := c.ClassListClient.UpdateClass(ctx, preq)
+	if err != nil {
+		return web.Response{}, errs.UPDATE_CLASS_ERROR(err)
+	}
+	return web.Response{
+		Msg: "Success",
+	}, nil
+}
+
+// GetRecycleBinClassInfos 获取回收站中的课表信息
+// @Summary 获取回收站课表信息
+// @Description 获取已删除但未彻底清除的课表信息
+// @Tags 课表
+// @Param year query string true "学年" 学年 "2024" -> 代表"2024-2025学年"
+// @Param semester query string true "学期" 学期 "1"代表第一学期，"2"代表第二学期，"3"代表第三学期
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Success 200 {object} web.Response{data=GetRecycleBinClassInfosResp} "成功获取回收站课表信息"
+// @Router /class/getRecycle [get]
+func (c *ClassHandler) GetRecycleBinClassInfos(ctx *gin.Context, req GetRecycleBinClassInfosReq, uc ijwt.UserClaims) (web.Response, error) {
+	classes, err := c.ClassListClient.GetRecycleBinClassInfos(ctx, &classlistv1.GetRecycleBinClassRequest{
+		StuId:    uc.StudentId,
+		Year:     req.Year,
+		Semester: req.Semester,
+	})
+	if err != nil {
+		return web.Response{}, errs.GET_RECYCLE_CLASS_ERROR(err)
+	}
+	var resp GetRecycleBinClassInfosResp
+	err = copier.Copy(&resp.ClassInfos, &classes.ClassInfos)
+	if err != nil {
+		return web.Response{}, errs.TYPE_CHANGE_ERROR(err)
+	}
+	return web.Response{
+		Msg:  "Success",
+		Data: resp,
+	}, nil
+}
+
+// RecoverClass 恢复课表
+// @Summary 恢复课表
+// @Description 从回收站恢复课表
+// @Tags 课表
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Param body body RecoverClassRequest true "恢复课表请求"
+// @Success 200 {object} web.Response "成功恢复课表"
+// @Router /class/recover [put]
+func (c *ClassHandler) RecoverClass(ctx *gin.Context, req RecoverClassRequest, uc ijwt.UserClaims) (web.Response, error) {
+	_, err := c.ClassListClient.RecoverClass(ctx, &classlistv1.RecoverClassRequest{
+		StuId:    uc.StudentId,
+		Year:     req.Year,
+		Semester: req.Semester,
+		ClassId:  req.ClassId,
+	})
+	if err != nil {
+		return web.Response{}, errs.RECOVER_CLASS_ERROR(err)
+	}
+	return web.Response{
+		Msg: "Success",
+	}, nil
+}
+
+// SearchClass 查询课程
+// @Summary 搜索课程
+// @Description 根据关键词搜索课程
+// @Tags 课表
+// @Param year query string true "学年"
+// @Param semester query string true "学期"
+// @Param searchKeyWords query string true "搜索关键词"
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Param body body SearchRequest true "搜索课程请求"
+// @Success 200 {object} web.Response{data=SearchClassResp} "成功搜索到课程"
+// @Router /class/search [get]
+func (c *ClassHandler) SearchClass(ctx *gin.Context, req SearchRequest) (web.Response, error) {
+	classes, err := c.ClassServiceClinet.SearchClass(ctx, &cs.SearchRequest{
+		Year:           req.Year,
+		Semester:       req.Semester,
+		SearchKeyWords: req.SearchKeyWords,
+	})
+
+	if err != nil {
+		return web.Response{}, errs.SEARCH_CLASS_ERROR(err)
+	}
+	var resp SearchClassResp
+	err = copier.Copy(&resp.ClassInfos, &classes.ClassInfos)
+	if err != nil {
+		return web.Response{
+			Code: errs.INTERNAL_SERVER_ERROR_CODE,
+			Msg:  "系统异常",
+		}, errs.TYPE_CHANGE_ERROR(err)
+	}
+	return web.Response{
+		Msg:  "Success",
+		Data: resp,
+	}, nil
+}
