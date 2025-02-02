@@ -116,3 +116,9 @@ type SearchClassResp struct {
 type GetRecycleBinClassInfosResp struct {
 	ClassInfos []*ClassInfo `json:"classInfos"`
 }
+type GetSchoolDayReq struct{}
+
+type GetSchoolDayResp struct {
+	HolidayTime string `json:"holiday_time"`
+	SchoolTime  string `json:"school_time"`
+}

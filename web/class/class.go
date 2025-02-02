@@ -37,6 +37,7 @@ func (c *ClassHandler) RegisterRoutes(s *gin.RouterGroup, authMiddleware gin.Han
 	sg.GET("/getRecycle", authMiddleware, ginx.WrapClaimsAndReq(c.GetRecycleBinClassInfos))
 	sg.PUT("/recover", authMiddleware, ginx.WrapClaimsAndReq(c.RecoverClass))
 	sg.GET("/search", authMiddleware, ginx.WrapReq(c.SearchClass))
+	sg.GET("/day/get", authMiddleware, ginx.WrapReq(c.GetSchoolDay))
 }
 
 // GetClassList 获取课表
@@ -256,5 +257,22 @@ func (c *ClassHandler) SearchClass(ctx *gin.Context, req SearchRequest) (web.Res
 	return web.Response{
 		Msg:  "Success",
 		Data: resp,
+	}, nil
+}
+
+func (c *ClassHandler) GetSchoolDay(ctx *gin.Context, req GetSchoolDayReq) (web.Response, error) {
+	res, err := c.ClassListClient.GetSchoolDay(ctx, &classlistv1.GetSchoolDayReq{})
+	if err != nil {
+		return web.Response{
+			Code: errs.INTERNAL_SERVER_ERROR_CODE,
+			Msg:  "系统异常",
+		}, errs.TYPE_CHANGE_ERROR(err)
+	}
+	return web.Response{
+		Msg: "Success",
+		Data: GetSchoolDayResp{
+			HolidayTime: res.HolidayTime,
+			SchoolTime:  res.SchoolTime,
+		},
 	}, nil
 }
