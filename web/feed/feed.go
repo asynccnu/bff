@@ -22,7 +22,7 @@ func NewFeedHandler(feedClient feedv1.FeedServiceClient,
 	return &FeedHandler{feedClient: feedClient, Administrators: administrators}
 }
 
-func (h *FeedHandler) RegisterRoutes(s *gin.Engine, authMiddleware gin.HandlerFunc) {
+func (h *FeedHandler) RegisterRoutes(s *gin.RouterGroup, authMiddleware gin.HandlerFunc) {
 	sg := s.Group("/feed")
 	sg.GET("/getFeedEvents", authMiddleware, ginx.WrapClaims(h.GetFeedEvents))
 	sg.POST("/clearFeedEvent", authMiddleware, ginx.WrapClaimsAndReq(h.ClearFeedEvent))

@@ -20,7 +20,7 @@ func NewCardHandler(CardClient cardv1.CardClient,
 	return &CardHandler{CardClient: CardClient, Administrators: administrators}
 }
 
-func (h *CardHandler) RegisterRoute(s *gin.Engine, authMiddleware gin.HandlerFunc) {
+func (h *CardHandler) RegisterRoute(s *gin.RouterGroup, authMiddleware gin.HandlerFunc) {
 	sg := s.Group("/card")
 	sg.POST("/noteUserKey", authMiddleware, ginx.WrapClaimsAndReq(h.NoteUserKey))
 	sg.POST("/updateUserKey", authMiddleware, ginx.WrapClaimsAndReq(h.UpdateUserKey))

@@ -22,7 +22,7 @@ func NewWebsiteHandler(websiteClient websitev1.WebsiteServiceClient,
 	return &WebsiteHandler{websiteClient: websiteClient, Administrators: administrators}
 }
 
-func (h *WebsiteHandler) RegisterRoutes(s *gin.Engine, authMiddleware gin.HandlerFunc) {
+func (h *WebsiteHandler) RegisterRoutes(s *gin.RouterGroup, authMiddleware gin.HandlerFunc) {
 	sg := s.Group("/website")
 	sg.GET("/getWebsites", ginx.Wrap(h.GetWebsites))
 	sg.POST("/saveWebsite", authMiddleware, ginx.WrapClaimsAndReq(h.SaveWebsite))

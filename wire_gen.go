@@ -54,7 +54,8 @@ func InitApp() *App {
 	infoSumHandler := ioc.InitInfoSumHandler(infoSumServiceClient)
 	cardClient := ioc.InitCardClient(client)
 	cardHandler := ioc.InitCardHandler(cardClient)
-	engine := ioc.InitGinServer(loggerMiddleware, loginMiddleware, corsMiddleware, tubeHandler, userHandler, staticHandler, bannerHandler, departmentHandler, websiteHandler, calendarHandler, feedHandler, elecPriceHandler, gradeHandler, classHandler, feedbackHelpHandler, infoSumHandler, cardHandler)
+	metricsHandler := ioc.InitMetricsHandel()
+	engine := ioc.InitGinServer(loggerMiddleware, loginMiddleware, corsMiddleware, tubeHandler, userHandler, staticHandler, bannerHandler, departmentHandler, websiteHandler, calendarHandler, feedHandler, elecPriceHandler, gradeHandler, classHandler, feedbackHelpHandler, infoSumHandler, cardHandler, metricsHandler)
 	app := NewApp(engine)
 	return app
 }

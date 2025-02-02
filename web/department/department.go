@@ -21,7 +21,7 @@ func NewDepartmentHandler(departmentClient departmentv1.DepartmentServiceClient,
 	return &DepartmentHandler{departmentClient: departmentClient, Administrators: administrators}
 }
 
-func (h *DepartmentHandler) RegisterRoutes(s *gin.Engine, authMiddleware gin.HandlerFunc) {
+func (h *DepartmentHandler) RegisterRoutes(s *gin.RouterGroup, authMiddleware gin.HandlerFunc) {
 	sg := s.Group("/department")
 	sg.GET("/getDepartments", ginx.Wrap(h.GetDepartments))
 	sg.POST("/saveDepartment", authMiddleware, ginx.WrapClaimsAndReq(h.SaveDepartment))

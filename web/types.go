@@ -3,7 +3,7 @@ package web
 import "github.com/gin-gonic/gin"
 
 type handler interface {
-	RegisterRoutes(s *gin.Engine, authMiddleware gin.HandlerFunc)
+	RegisterRoutes(s *gin.RouterGroup, authMiddleware gin.HandlerFunc)
 }
 
 type Response struct {

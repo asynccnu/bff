@@ -36,7 +36,10 @@ func (lm *LoggerMiddleware) MiddlewareFunc() gin.HandlerFunc {
 		// 记录活跃连接数
 		lm.prometheus.ActiveConnections.WithLabelValues(path).Inc()
 		defer func() {
-
+			//打点路由特殊化处理这里还没有想到更好的方案,先这样吧
+			if path == "/api/v1/metrics/:eventName" {
+				path = "/api/v1/metrics/" + ctx.Param("eventName")
+			}
 			// 记录响应信息
 			lm.prometheus.ActiveConnections.WithLabelValues(path).Dec()
 			status := ctx.Writer.Status()

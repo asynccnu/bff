@@ -33,7 +33,7 @@ func NewGradeHandler(
 	}
 }
 
-func (h *GradeHandler) RegisterRoutes(s *gin.Engine, authMiddleware gin.HandlerFunc) {
+func (h *GradeHandler) RegisterRoutes(s *gin.RouterGroup, authMiddleware gin.HandlerFunc) {
 	sg := s.Group("/grade")
 	//这里有三类路由,分别是ginx.WrapClaimsAndReq()有参数且要验证
 	sg.GET("/getGradeByTerm", authMiddleware, ginx.WrapClaimsAndReq(h.GetGradeByTerm))

@@ -27,7 +27,7 @@ func NewUserHandler(hdl ijwt.Handler, userSvc userv1.UserServiceClient, ccnuSvc 
 }
 
 // 注册user的路由
-func (h *UserHandler) RegisterRoutes(s *gin.Engine, authMiddleware gin.HandlerFunc) {
+func (h *UserHandler) RegisterRoutes(s *gin.RouterGroup, authMiddleware gin.HandlerFunc) {
 	ug := s.Group("/users")
 	ug.POST("/login_ccnu", ginx.WrapReq(h.LoginByCCNU))
 	ug.POST("/logout", authMiddleware, ginx.Wrap(h.Logout))

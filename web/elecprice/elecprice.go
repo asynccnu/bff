@@ -19,7 +19,7 @@ func NewElecPriceHandler(elecPriceClient elecpricev1.ElecpriceServiceClient,
 	return &ElecPriceHandler{ElecPriceClient: elecPriceClient, Administrators: administrators}
 }
 
-func (h *ElecPriceHandler) RegisterRoutes(s *gin.Engine, authMiddleware gin.HandlerFunc) {
+func (h *ElecPriceHandler) RegisterRoutes(s *gin.RouterGroup, authMiddleware gin.HandlerFunc) {
 	sg := s.Group("/elecprice")
 	sg.GET("/check", authMiddleware, ginx.WrapClaimsAndReq(h.Check))
 	sg.POST("/setStandard", authMiddleware, ginx.WrapClaimsAndReq(h.SetStandard))

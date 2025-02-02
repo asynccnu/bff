@@ -21,7 +21,7 @@ func NewCalendarHandler(calendarClient calendarv1.CalendarServiceClient,
 	return &CalendarHandler{calendarClient: calendarClient, Administrators: administrators}
 }
 
-func (h *CalendarHandler) RegisterRoutes(s *gin.Engine, authMiddleware gin.HandlerFunc) {
+func (h *CalendarHandler) RegisterRoutes(s *gin.RouterGroup, authMiddleware gin.HandlerFunc) {
 	sg := s.Group("/calendar")
 	sg.GET("/getCalendar", ginx.WrapReq(h.GetCalendar))
 	sg.POST("/saveCalendar", authMiddleware, ginx.WrapClaimsAndReq(h.SaveCalendar))

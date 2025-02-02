@@ -22,7 +22,7 @@ func NewInfoSumHandler(InfoSumClient InfoSumv1.InfoSumServiceClient,
 	return &InfoSumHandler{InfoSumClient: InfoSumClient, Administrators: administrators}
 }
 
-func (h *InfoSumHandler) RegisterRoutes(s *gin.Engine, authMiddleware gin.HandlerFunc) {
+func (h *InfoSumHandler) RegisterRoutes(s *gin.RouterGroup, authMiddleware gin.HandlerFunc) {
 	sg := s.Group("/InfoSum")
 	sg.GET("/getInfoSums", ginx.Wrap(h.GetInfoSums))
 	sg.POST("/saveInfoSum", authMiddleware, ginx.WrapClaimsAndReq(h.SaveInfoSum))

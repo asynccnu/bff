@@ -30,10 +30,10 @@ import (
 	"github.com/asynccnu/bff/web/grade"
 	"github.com/asynccnu/bff/web/ijwt"
 	"github.com/asynccnu/bff/web/infoSum"
-	"github.com/asynccnu/bff/web/user"
-
+	"github.com/asynccnu/bff/web/metrics"
 	"github.com/asynccnu/bff/web/static"
 	"github.com/asynccnu/bff/web/tube"
+	"github.com/asynccnu/bff/web/user"
 	"github.com/asynccnu/bff/web/website"
 	"github.com/ecodeclub/ekit/slice"
 	"github.com/qiniu/api.v7/v7/auth/qbox"
@@ -207,4 +207,8 @@ func InitUserHandler(hdl ijwt.Handler, userClient userv1.UserServiceClient, ccnu
 
 func InitTubeHandler(putPolicy storage.PutPolicy, mac *qbox.Mac) *tube.TubeHandler {
 	return tube.NewTubeHandler(putPolicy, mac, viper.GetString("oss.domainName"))
+}
+
+func InitMetricsHandel() *metrics.MetricsHandler {
+	return metrics.NewMetricsHandler()
 }

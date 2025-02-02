@@ -24,7 +24,7 @@ func NewBannerHandler(bannerClient bannerv1.BannerServiceClient,
 }
 
 // RegisterRoutes 注册与 banner 相关的路由
-func (h *BannerHandler) RegisterRoutes(s *gin.Engine, authMiddleware gin.HandlerFunc) {
+func (h *BannerHandler) RegisterRoutes(s *gin.RouterGroup, authMiddleware gin.HandlerFunc) {
 	sg := s.Group("/banner")
 	sg.GET("/getBanners", ginx.Wrap(h.GetBanners))
 	sg.POST("/saveBanner", authMiddleware, ginx.WrapClaimsAndReq(h.SaveBanner))

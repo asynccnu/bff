@@ -53,6 +53,7 @@ func InitApp() *App {
 		ioc.InitFeedbackHelpHandler,
 		ioc.InitInfoSumHandler,
 		ioc.InitCardHandler,
+		ioc.InitMetricsHandel,
 
 		//中间件
 		middleware.NewLoggerMiddleware,

@@ -20,7 +20,7 @@ func NewFeedbackHelpHandler(FeedbackHelpClient feedback_helpv1.FeedbackHelpClien
 	return &FeedbackHelpHandler{FeedbackHelpClient: FeedbackHelpClient, Administrators: administrators}
 }
 
-func (h *FeedbackHelpHandler) RegisterRoutes(s *gin.Engine, authMiddleware gin.HandlerFunc) {
+func (h *FeedbackHelpHandler) RegisterRoutes(s *gin.RouterGroup, authMiddleware gin.HandlerFunc) {
 	sg := s.Group("/feedback_help")
 	sg.GET("/getQuestion", authMiddleware, ginx.Wrap(h.GetQuestions))
 	sg.POST("/createQuestion", authMiddleware, ginx.WrapClaimsAndReq(h.CreateQuestion))

@@ -27,7 +27,7 @@ func NewStaticHandler(
 	return &StaticHandler{staticClient: staticClient, fileToHTMLConverterMap: fileToHTMLConverterMap, Administrators: administrators}
 }
 
-func (h *StaticHandler) RegisterRoutes(s *gin.Engine, authMiddleware gin.HandlerFunc) {
+func (h *StaticHandler) RegisterRoutes(s *gin.RouterGroup, authMiddleware gin.HandlerFunc) {
 	sg := s.Group("/statics")
 	sg.GET("", ginx.WrapReq(h.GetStaticByName))
 	sg.GET("/match/labels", ginx.Wrap(h.GetStaticByLabels))

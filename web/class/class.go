@@ -28,7 +28,7 @@ func NewClassListHandler(
 	}
 }
 
-func (c *ClassHandler) RegisterRoutes(s *gin.Engine, authMiddleware gin.HandlerFunc) {
+func (c *ClassHandler) RegisterRoutes(s *gin.RouterGroup, authMiddleware gin.HandlerFunc) {
 	sg := s.Group("/class")
 	sg.GET("/get", authMiddleware, ginx.WrapClaimsAndReq(c.GetClassList))
 	sg.POST("/add", authMiddleware, ginx.WrapClaimsAndReq(c.AddClass))

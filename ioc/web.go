@@ -12,12 +12,14 @@ import (
 	"github.com/asynccnu/bff/web/feedback_help"
 	"github.com/asynccnu/bff/web/grade"
 	"github.com/asynccnu/bff/web/infoSum"
+	"github.com/asynccnu/bff/web/metrics"
 	"github.com/asynccnu/bff/web/middleware"
 	"github.com/asynccnu/bff/web/static"
 	"github.com/asynccnu/bff/web/tube"
 	"github.com/asynccnu/bff/web/user"
 	"github.com/asynccnu/bff/web/website"
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"time"
 )
 
@@ -40,11 +42,16 @@ func InitGinServer(
 	feedback *feedback_help.FeedbackHelpHandler,
 	infoSum *infoSum.InfoSumHandler,
 	card *card.CardHandler,
+	metrics *metrics.MetricsHandler,
 ) *gin.Engine {
 	//初始化一个gin引擎
 	engine := gin.Default()
+	api := engine.Group("/api/v1")
+
+	//在所有的中间件之前进行打点路由的注册(这里是给Prometheus读取用的路由),中间件可能导致其失效所以放在最前面
+	api.GET("/metrics", gin.WrapH(promhttp.Handler()))
 	//使用全局中间件
-	engine.Use(
+	api.Use(
 		corsMiddleware.MiddlewareFunc(),
 		loggerMiddleware.MiddlewareFunc(),
 	)
@@ -53,21 +60,21 @@ func InitGinServer(
 	authMiddleware := loginMiddleware.MiddlewareFunc()
 
 	//注册一堆路由
-	user.RegisterRoutes(engine, authMiddleware)
-	static.RegisterRoutes(engine, authMiddleware)
-	banner.RegisterRoutes(engine, authMiddleware)
-	department.RegisterRoutes(engine, authMiddleware)
-	website.RegisterRoutes(engine, authMiddleware)
-	calendar.RegisterRoutes(engine, authMiddleware)
-	feed.RegisterRoutes(engine, authMiddleware)
-	elecprice.RegisterRoutes(engine, authMiddleware)
-	class.RegisterRoutes(engine, authMiddleware)
-	feedback.RegisterRoutes(engine, authMiddleware)
-	infoSum.RegisterRoutes(engine, authMiddleware)
-	grade.RegisterRoutes(engine, authMiddleware)
-	card.RegisterRoute(engine, authMiddleware)
-	tube.RegisterRoutes(engine, authMiddleware)
-
+	user.RegisterRoutes(api, authMiddleware)
+	static.RegisterRoutes(api, authMiddleware)
+	banner.RegisterRoutes(api, authMiddleware)
+	department.RegisterRoutes(api, authMiddleware)
+	website.RegisterRoutes(api, authMiddleware)
+	calendar.RegisterRoutes(api, authMiddleware)
+	feed.RegisterRoutes(api, authMiddleware)
+	elecprice.RegisterRoutes(api, authMiddleware)
+	class.RegisterRoutes(api, authMiddleware)
+	feedback.RegisterRoutes(api, authMiddleware)
+	infoSum.RegisterRoutes(api, authMiddleware)
+	grade.RegisterRoutes(api, authMiddleware)
+	card.RegisterRoute(api, authMiddleware)
+	tube.RegisterRoutes(api, authMiddleware)
+	metrics.RegisterRoutes(api, authMiddleware)
 	//返回路由
 	return engine
 }

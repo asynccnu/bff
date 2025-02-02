@@ -23,7 +23,7 @@ func NewTubeHandler(putPolicy storage.PutPolicy, mac *qbox.Mac, domainName strin
 	}
 }
 
-func (t *TubeHandler) RegisterRoutes(s *gin.Engine, authMiddleware gin.HandlerFunc) {
+func (t *TubeHandler) RegisterRoutes(s *gin.RouterGroup, authMiddleware gin.HandlerFunc) {
 	tg := s.Group("/tube")
 	tg.GET("/access_token", authMiddleware, ginx.WrapClaims(t.GetTubeToken))
 }

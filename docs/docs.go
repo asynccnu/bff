@@ -1837,6 +1837,23 @@ const docTemplate = `{
                 }
             }
         },
+        "/metrics/:eventName": {
+            "post": {
+                "description": "用于打点的路由,如果是不经过后端的服务但是需要打点的话,可以使用这个路由自动记录(例如:/metrics/kstack)表示跳转访问课栈,使用这一路由必须携带Auth请求头",
+                "tags": [
+                    "打点"
+                ],
+                "summary": "用于打点的路由",
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "$ref": "#/definitions/web.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/statics": {
             "get": {
                 "description": "根据静态资源名称获取静态资源的内容。",
@@ -2979,36 +2996,47 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "Kclbmc": {
+                    "description": "课程类别名称",
                     "type": "string"
                 },
                 "cj": {
+                    "description": "最终成绩",
                     "type": "number"
                 },
                 "finalGrade": {
+                    "description": "期末成绩分数",
                     "type": "number"
                 },
                 "finalGradePercent": {
+                    "description": "/期末成绩占比",
                     "type": "string"
                 },
                 "jd": {
+                    "description": "绩点",
                     "type": "number"
                 },
                 "kcbj": {
+                    "description": "课程标记(主修/辅修)",
                     "type": "string"
                 },
                 "kcmc": {
+                    "description": "课程名称",
                     "type": "string"
                 },
                 "kcxzmc": {
+                    "description": "课程性质名称",
                     "type": "string"
                 },
                 "regularGrade": {
+                    "description": "平时成绩分数",
                     "type": "number"
                 },
                 "regularGradePercent": {
+                    "description": "平时成绩占比",
                     "type": "string"
                 },
                 "xf": {
+                    "description": "学分",
                     "type": "number"
                 }
             }
@@ -3017,9 +3045,11 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "kcmc": {
+                    "description": "课程名称",
                     "type": "string"
                 },
                 "xf": {
+                    "description": "学分",
                     "type": "number"
                 }
             }
@@ -3034,6 +3064,7 @@ const docTemplate = `{
                     }
                 },
                 "kcxzmc": {
+                    "description": "课程性质名称",
                     "type": "string"
                 }
             }
