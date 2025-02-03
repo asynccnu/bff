@@ -119,6 +119,6 @@ type GetRecycleBinClassInfosResp struct {
 type GetSchoolDayReq struct{}
 
 type GetSchoolDayResp struct {
-	HolidayTime string `json:"holiday_time"`
-	SchoolTime  string `json:"school_time"`
+	HolidayTime int64 `json:"holiday_time"`
+	SchoolTime  int64 `json:"school_time"`
 }

@@ -494,6 +494,47 @@ const docTemplate = `{
                 }
             }
         },
+        "/class/day/get": {
+            "get": {
+                "description": "获取当前周",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "课表"
+                ],
+                "summary": "获取当前周",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功获取到当前周",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/web.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/class.GetSchoolDayResp"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/class/delete": {
             "delete": {
                 "description": "根据课表ID删除课表",
@@ -1739,6 +1780,46 @@ const docTemplate = `{
                 }
             }
         },
+        "/feedback_help/noteQuestion": {
+            "post": {
+                "description": "标记问题解决状态",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "帮助与反馈"
+                ],
+                "summary": "标记问题解决状态",
+                "parameters": [
+                    {
+                        "description": "标记问题解决状态",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/feedback_help.NoteQuestionReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "$ref": "#/definitions/web.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "系统异常",
+                        "schema": {
+                            "$ref": "#/definitions/web.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/grade/getGradeByTerm": {
             "get": {
                 "description": "根据学年号和学期号获取用户的成绩",
@@ -2492,6 +2573,17 @@ const docTemplate = `{
                 }
             }
         },
+        "class.GetSchoolDayResp": {
+            "type": "object",
+            "properties": {
+                "holiday_time": {
+                    "type": "integer"
+                },
+                "school_time": {
+                    "type": "integer"
+                }
+            }
+        },
         "class.RecoverClassRequest": {
             "type": "object",
             "properties": {
@@ -2966,6 +3058,17 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/feedback_help.FrequentlyAskedQuestion"
                     }
+                }
+            }
+        },
+        "feedback_help.NoteQuestionReq": {
+            "type": "object",
+            "properties": {
+                "if_over": {
+                    "type": "boolean"
+                },
+                "question_id": {
+                    "type": "integer"
                 }
             }
         },

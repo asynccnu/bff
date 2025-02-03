@@ -9,6 +9,7 @@ import (
 	"github.com/asynccnu/bff/web/ijwt"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
+	"time"
 )
 
 type ClassHandler struct {
@@ -260,19 +261,43 @@ func (c *ClassHandler) SearchClass(ctx *gin.Context, req SearchRequest) (web.Res
 	}, nil
 }
 
+// GetSchoolDay 获取当前周
+// @Summary 获取当前周
+// @Description 获取当前周
+// @Tags 课表
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Success 200 {object} web.Response{data=GetSchoolDayResp} "成功获取到当前周"
+// @Router /class/day/get [get]
 func (c *ClassHandler) GetSchoolDay(ctx *gin.Context, req GetSchoolDayReq) (web.Response, error) {
-	res, err := c.ClassListClient.GetSchoolDay(ctx, &classlistv1.GetSchoolDayReq{})
+	// TODO，转换为Unix时间戳
+	//res, err := c.ClassListClient.GetSchoolDay(ctx, &classlistv1.GetSchoolDayReq{})
+	//if err != nil {
+	//	return web.Response{
+	//		Code: errs.INTERNAL_SERVER_ERROR_CODE,
+	//		Msg:  "系统异常",
+	//	}, errs.TYPE_CHANGE_ERROR(err)
+	//}
+	//加载 "Asia/Shanghai" 时区
+
+	loc, _ := time.LoadLocation("Asia/Shanghai")
+	holiday, err := time.ParseInLocation("2006-01-02", "2025-02-17", loc)
 	if err != nil {
-		return web.Response{
-			Code: errs.INTERNAL_SERVER_ERROR_CODE,
-			Msg:  "系统异常",
-		}, errs.TYPE_CHANGE_ERROR(err)
+		return web.Response{}, nil
 	}
+
+	school, err := time.ParseInLocation("2006-01-02", "2025-06-22", loc)
+	if err != nil {
+		return web.Response{}, nil
+	}
+
 	return web.Response{
 		Msg: "Success",
 		Data: GetSchoolDayResp{
-			HolidayTime: res.HolidayTime,
-			SchoolTime:  res.SchoolTime,
+			//HolidayTime: res.HolidayTime,
+			//SchoolTime:  res.SchoolTime,
+			HolidayTime: holiday.Unix(),
+			SchoolTime:  school.Unix(),
 		},
 	}, nil
 }

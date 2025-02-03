@@ -27,6 +27,7 @@ func (h *FeedbackHelpHandler) RegisterRoutes(s *gin.RouterGroup, authMiddleware 
 	sg.POST("/changeQuestion", authMiddleware, ginx.WrapClaimsAndReq(h.ChangeQuestion))
 	sg.POST("/deleteQuestion", authMiddleware, ginx.WrapClaimsAndReq(h.DeleteQuestion))
 	sg.POST("/findQuestionsByName", authMiddleware, ginx.WrapReq(h.FindQuestionsByName))
+	sg.POST("/noteQuestion", authMiddleware, ginx.WrapReq(h.NoteQuestion))
 }
 
 // @Summary 获取常见问题
@@ -179,6 +180,29 @@ func (h *FeedbackHelpHandler) FindQuestionsByName(c *gin.Context, req FindQuesti
 	}, nil
 }
 
+// @Summary 标记问题解决状态
+// @Description 标记问题解决状态
+// @Tags 帮助与反馈
+// @Accept  json
+// @Produce  json
+// @Param data body NoteQuestionReq true "标记问题解决状态"
+// @Success 200 {object} web.Response{} "成功"
+// @Failure 500 {object} web.Response "系统异常"
+// @Router /feedback_help/noteQuestion [post]
+func (h *FeedbackHelpHandler) NoteQuestion(c *gin.Context, req NoteQuestionReq) (web.Response, error) {
+	_, err := h.FeedbackHelpClient.NoteQuestion(c, &feedback_helpv1.NoteQuestionRequest{
+		QuestionId: req.QuestionId,
+		IfOver:     req.IfOver,
+	})
+
+	if err != nil {
+		return web.Response{}, errs.NOTE_QUESTION_ERROR(err)
+	}
+
+	return web.Response{
+		Msg: "Success",
+	}, nil
+}
 func (h *FeedbackHelpHandler) isAdmin(studentId string) bool {
 	_, exists := h.Administrators[studentId]
 	return exists

@@ -211,7 +211,11 @@ var (
 	}
 
 	FIND_QUESTIONS_BY_NAME_ERROR = func(err error) error {
-		return errorx.New(http.StatusInternalServerError, INTERNAL_SERVER_ERROR_CODE, "按名称查找问题失败!", "grade", err)
+		return errorx.New(http.StatusInternalServerError, INTERNAL_SERVER_ERROR_CODE, "按名称查找问题失败!", "question", err)
+	}
+
+	NOTE_QUESTION_ERROR = func(err error) error {
+		return errorx.New(http.StatusInternalServerError, INTERNAL_SERVER_ERROR_CODE, "标记问题状态失败!", "question", err)
 	}
 )
 

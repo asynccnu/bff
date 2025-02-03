@@ -199,6 +199,13 @@ definitions:
           $ref: '#/definitions/class.ClassInfo'
         type: array
     type: object
+  class.GetSchoolDayResp:
+    properties:
+      holiday_time:
+        type: integer
+      school_time:
+        type: integer
+    type: object
   class.RecoverClassRequest:
     properties:
       classId:
@@ -513,6 +520,13 @@ definitions:
         items:
           $ref: '#/definitions/feedback_help.FrequentlyAskedQuestion'
         type: array
+    type: object
+  feedback_help.NoteQuestionReq:
+    properties:
+      if_over:
+        type: boolean
+      question_id:
+        type: integer
     type: object
   grade.GetGradeByTermResp:
     properties:
@@ -1014,6 +1028,30 @@ paths:
           schema:
             $ref: '#/definitions/web.Response'
       summary: 添加课表
+      tags:
+      - 课表
+  /class/day/get:
+    get:
+      description: 获取当前周
+      parameters:
+      - description: Bearer Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功获取到当前周
+          schema:
+            allOf:
+            - $ref: '#/definitions/web.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/class.GetSchoolDayResp'
+              type: object
+      summary: 获取当前周
       tags:
       - 课表
   /class/delete:
@@ -1779,6 +1817,32 @@ paths:
           schema:
             $ref: '#/definitions/web.Response'
       summary: 获取常见问题
+      tags:
+      - 帮助与反馈
+  /feedback_help/noteQuestion:
+    post:
+      consumes:
+      - application/json
+      description: 标记问题解决状态
+      parameters:
+      - description: 标记问题解决状态
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/feedback_help.NoteQuestionReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/web.Response'
+        "500":
+          description: 系统异常
+          schema:
+            $ref: '#/definitions/web.Response'
+      summary: 标记问题解决状态
       tags:
       - 帮助与反馈
   /grade/getGradeByTerm:
