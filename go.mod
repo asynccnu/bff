@@ -32,7 +32,7 @@ require (
 )
 
 require (
-	github.com/asynccnu/be-api v0.0.0-20250202091458-2048739a239d
+	github.com/asynccnu/be-api v0.0.0-20250217113844-60da3c8dddbe
 	github.com/golang/protobuf v1.5.4
 )
 

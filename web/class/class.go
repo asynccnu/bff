@@ -60,6 +60,7 @@ func (c *ClassHandler) GetClassList(ctx *gin.Context, req GetClassListRequest, u
 		StuId:    uc.StudentId,
 		Semester: req.Semester,
 		Year:     req.Year,
+		Refresh:  req.Refresh,
 	})
 	if err != nil {
 		return web.Response{}, errs.GET_CLASS_LIST_ERROR(err)
