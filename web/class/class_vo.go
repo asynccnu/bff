@@ -32,7 +32,7 @@ type AddClassRequest struct {
 	// 教师
 	Teacher string `json:"teacher,omitempty"`
 	// 哪些周
-	Weeks int64 `json:"weeks,omitempty"`
+	Weeks []int `json:"weeks,omitempty"`
 	// 学期
 	Semester string `json:"semester,omitempty"`
 	// 学年

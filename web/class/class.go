@@ -90,13 +90,16 @@ func (c *ClassHandler) GetClassList(ctx *gin.Context, req GetClassListRequest, u
 // @Success 200 {object} web.Response "成功添加课表"
 // @Router /class/add [post]
 func (c *ClassHandler) AddClass(ctx *gin.Context, req AddClassRequest, uc ijwt.UserClaims) (web.Response, error) {
+
+	weeks := c.ConvertWeek(req.Weeks)
+
 	var preq = &cs.AddClassRequest{
 		StuId:    uc.StudentId,
 		Name:     req.Name,
 		DurClass: req.DurClass,
 		Where:    req.Where,
 		Teacher:  req.Where,
-		Weeks:    req.Weeks,
+		Weeks:    weeks,
 		Semester: req.Semester,
 		Year:     req.Year,
 		Day:      req.Day,
@@ -111,6 +114,23 @@ func (c *ClassHandler) AddClass(ctx *gin.Context, req AddClassRequest, uc ijwt.U
 		Msg: "Success",
 	}, nil
 }
+
+func (c *ClassHandler) ConvertWeek(weeks []int) int64 {
+	var res int64
+
+	for _,week := range weeks {
+		if week <1 || week >= 30 {
+			continue
+		}
+
+		res |= 1 << (week-1)
+	}
+	return res
+}
+
+
+
+
 
 // DeleteClass 删除课表
 // @Summary 删除课表
