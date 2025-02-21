@@ -16,7 +16,7 @@ type ClassInfo struct {
 	WeekDuration string  `json:"week_duration"` //上课的周数
 	Classname    string  `json:"classname"`     //课程名称
 	Credit       float64 `json:"credit"`        //学分
-	Weeks        int64   `json:"weeks"`         //哪些周
+	Weeks        []int   `json:"weeks"`         //哪些周
 	Semester     string  `json:"semester"`      //学期
 	Year         string  `json:"year"`          //学年
 }
@@ -62,7 +62,7 @@ type UpdateClassRequest struct {
 	// 教师
 	Teacher *string ` json:"teacher,omitempty"`
 	// 哪些周
-	Weeks *int64 ` json:"weeks,omitempty"`
+	Weeks []int ` json:"weeks,omitempty"`
 	// 学期
 	Semester string ` json:"semester,omitempty"`
 	// 学年
@@ -97,13 +97,12 @@ type SearchRequest struct {
 	Semester       string `form:"semester,omitempty"`
 }
 
-type Class struct {
-	Info     []*ClassInfo `json:"info"`
-	Thisweek bool         `json:"thisweek"`
-}
+//type Class struct {
+//	Info     []*ClassInfo `json:"info"`
+//}
 
 type GetClassListResp struct {
-	Classes []*Class `json:"classes"`
+	Classes []*ClassInfo `json:"classes"`
 }
 
 type GetRecycleBinClassInfosReq struct {

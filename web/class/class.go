@@ -56,7 +56,6 @@ func (c *ClassHandler) RegisterRoutes(s *gin.RouterGroup, authMiddleware gin.Han
 func (c *ClassHandler) GetClassList(ctx *gin.Context, req GetClassListRequest, uc ijwt.UserClaims) (web.Response, error) {
 
 	classes, err := c.ClassListClient.GetClass(ctx, &classlistv1.GetClassRequest{
-		Week:     req.Week,
 		StuId:    uc.StudentId,
 		Semester: req.Semester,
 		Year:     req.Year,
@@ -66,13 +65,27 @@ func (c *ClassHandler) GetClassList(ctx *gin.Context, req GetClassListRequest, u
 		return web.Response{}, errs.GET_CLASS_LIST_ERROR(err)
 	}
 	var resp GetClassListResp
-	err = copier.Copy(&resp.Classes, &classes.Classes)
-	if err != nil {
-		return web.Response{
-			Code: errs.INTERNAL_SERVER_ERROR_CODE,
-			Msg:  "系统异常",
-		}, errs.TYPE_CHANGE_ERROR(err)
+
+	var respClasses = make([]*ClassInfo, 0, len(classes.Classes))
+
+	for _, class := range classes.Classes {
+		respClasses = append(respClasses, &ClassInfo{
+			ID:           class.Info.Id,
+			Day:          class.Info.Day,
+			Teacher:      class.Info.Teacher,
+			Where:        class.Info.Where,
+			ClassWhen:    class.Info.ClassWhen,
+			WeekDuration: class.Info.WeekDuration,
+			Classname:    class.Info.Classname,
+			Credit:       class.Info.Credit,
+			Weeks:        convertWeekFromIntToArray(req.Week),
+			Semester:     class.Info.Semester,
+			Year:         class.Info.Year,
+		})
 	}
+
+	resp.Classes = respClasses
+
 	return web.Response{
 		Msg:  "Success",
 		Data: resp,
@@ -91,7 +104,7 @@ func (c *ClassHandler) GetClassList(ctx *gin.Context, req GetClassListRequest, u
 // @Router /class/add [post]
 func (c *ClassHandler) AddClass(ctx *gin.Context, req AddClassRequest, uc ijwt.UserClaims) (web.Response, error) {
 
-	weeks := c.ConvertWeek(req.Weeks)
+	weeks := convertWeekFromArrayToInt(req.Weeks)
 
 	var preq = &cs.AddClassRequest{
 		StuId:    uc.StudentId,
@@ -114,23 +127,6 @@ func (c *ClassHandler) AddClass(ctx *gin.Context, req AddClassRequest, uc ijwt.U
 		Msg: "Success",
 	}, nil
 }
-
-func (c *ClassHandler) ConvertWeek(weeks []int) int64 {
-	var res int64
-
-	for _,week := range weeks {
-		if week <1 || week >= 30 {
-			continue
-		}
-
-		res |= 1 << (week-1)
-	}
-	return res
-}
-
-
-
-
 
 // DeleteClass 删除课表
 // @Summary 删除课表
@@ -168,6 +164,12 @@ func (c *ClassHandler) DeleteClass(ctx *gin.Context, req DeleteClassRequest, uc 
 // @Success 200 {object} web.Response "成功更新课表"
 // @Router /class/update [put]
 func (c *ClassHandler) UpdateClass(ctx *gin.Context, req UpdateClassRequest, uc ijwt.UserClaims) (web.Response, error) {
+	var weeks *int64
+	if len(req.Weeks)>0 {
+		tmpWeeks := convertWeekFromArrayToInt(req.Weeks)
+		weeks = &tmpWeeks
+	}
+
 	var preq = &classlistv1.UpdateClassRequest{
 		ClassId:  req.ClassId,
 		StuId:    uc.StudentId,
@@ -175,7 +177,7 @@ func (c *ClassHandler) UpdateClass(ctx *gin.Context, req UpdateClassRequest, uc 
 		DurClass: req.DurClass,
 		Where:    req.Where,
 		Teacher:  req.Where,
-		Weeks:    req.Weeks,
+		Weeks:    weeks,
 		Semester: req.Semester,
 		Year:     req.Year,
 		Day:      req.Day,
@@ -269,13 +271,27 @@ func (c *ClassHandler) SearchClass(ctx *gin.Context, req SearchRequest) (web.Res
 		return web.Response{}, errs.SEARCH_CLASS_ERROR(err)
 	}
 	var resp SearchClassResp
-	err = copier.Copy(&resp.ClassInfos, &classes.ClassInfos)
-	if err != nil {
-		return web.Response{
-			Code: errs.INTERNAL_SERVER_ERROR_CODE,
-			Msg:  "系统异常",
-		}, errs.TYPE_CHANGE_ERROR(err)
+
+	respClasses := make([]*ClassInfo,0,len(classes.ClassInfos))
+
+	for _, class := range classes.ClassInfos {
+		respClasses = append(respClasses, &ClassInfo{
+			ID:           class.Id,
+			Day:          class.Day,
+			Teacher:      class.Teacher,
+			Where:        class.Where,
+			ClassWhen:    class.ClassWhen,
+			WeekDuration: class.WeekDuration,
+			Classname:    class.Classname,
+			Credit:       class.Credit,
+			Weeks:        convertWeekFromIntToArray(class.Weeks),
+			Semester:     class.Semester,
+			Year:         class.Year,
+		})
 	}
+
+	resp.ClassInfos = respClasses
+
 	return web.Response{
 		Msg:  "Success",
 		Data: resp,
@@ -321,4 +337,28 @@ func (c *ClassHandler) GetSchoolDay(ctx *gin.Context, req GetSchoolDayReq) (web.
 			SchoolTime:  school.Unix(),
 		},
 	}, nil
+}
+
+func convertWeekFromArrayToInt(weeks []int) int64 {
+	var res int64
+
+	for _, week := range weeks {
+		if week < 1 || week >= 30 {
+			continue
+		}
+
+		res |= 1 << (week - 1)
+	}
+	return res
+}
+
+func convertWeekFromIntToArray(weeks int64) []int {
+	var res []int
+
+	for i := 0; i < 30; i++ {
+		if (weeks & (1 << uint(i))) != 0 {
+			res = append(res, i+1)
+		}
+	}
+	return res
 }
