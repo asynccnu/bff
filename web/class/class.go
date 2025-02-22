@@ -165,7 +165,7 @@ func (c *ClassHandler) DeleteClass(ctx *gin.Context, req DeleteClassRequest, uc 
 // @Router /class/update [put]
 func (c *ClassHandler) UpdateClass(ctx *gin.Context, req UpdateClassRequest, uc ijwt.UserClaims) (web.Response, error) {
 	var weeks *int64
-	if len(req.Weeks)>0 {
+	if len(req.Weeks) > 0 {
 		tmpWeeks := convertWeekFromArrayToInt(req.Weeks)
 		weeks = &tmpWeeks
 	}
@@ -250,7 +250,7 @@ func (c *ClassHandler) RecoverClass(ctx *gin.Context, req RecoverClassRequest, u
 
 // SearchClass 查询课程
 // @Summary 搜索课程
-// @Description 根据关键词搜索课程
+// @Description 根据关键词[教师或者课程名]搜索课程
 // @Tags 课表
 // @Param year query string true "学年"
 // @Param semester query string true "学期"
@@ -272,7 +272,7 @@ func (c *ClassHandler) SearchClass(ctx *gin.Context, req SearchRequest) (web.Res
 	}
 	var resp SearchClassResp
 
-	respClasses := make([]*ClassInfo,0,len(classes.ClassInfos))
+	respClasses := make([]*ClassInfo, 0, len(classes.ClassInfos))
 
 	for _, class := range classes.ClassInfos {
 		respClasses = append(respClasses, &ClassInfo{
