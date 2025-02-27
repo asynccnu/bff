@@ -53,6 +53,7 @@ func (h *FeedHandler) GetFeedEvents(ctx *gin.Context, uc ijwt.UserClaims) (web.R
 
 	//类型转换
 	var resp GetFeedEventsResp
+
 	err = copier.Copy(&resp, &feeds)
 	if err != nil {
 		return web.Response{}, errs.TYPE_CHANGE_ERROR(err)
@@ -66,7 +67,7 @@ func (h *FeedHandler) GetFeedEvents(ctx *gin.Context, uc ijwt.UserClaims) (web.R
 
 // ClearFeedEvent
 // @Summary 清除feed订阅事件
-// @Description 清除指定用户的feed订阅事件,feedid有三种状态0表示全部清除(不加参数默认为0),-1表示清除已读,指定feedid表示只清除这个id的feed消息
+// @Description 清除指定用户的feed订阅事件,都是可选字段
 // @Tags feed订阅
 // @Accept  json
 // @Produce  json
@@ -79,11 +80,13 @@ func (h *FeedHandler) ClearFeedEvent(ctx *gin.Context, req ClearFeedEventReq, uc
 	_, err := h.feedClient.ClearFeedEvent(ctx, &feedv1.ClearFeedEventReq{
 		StudentId: uc.StudentId, //用户的id
 		FeedId:    req.FeedId,
+		Status:    req.Status,
 	})
 
 	if err != nil {
 		return web.Response{}, errs.CLEAR_FEED_EVENT_ERROR(err)
 	}
+
 	return web.Response{
 		Msg: "Success",
 	}, nil

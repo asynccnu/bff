@@ -602,9 +602,9 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "type": "integer",
-                        "description": "当前周",
-                        "name": "week",
+                        "type": "boolean",
+                        "description": "是否强制从华师获取最新版本",
+                        "name": "refresh",
                         "in": "query",
                         "required": true
                     },
@@ -745,7 +745,7 @@ const docTemplate = `{
         },
         "/class/search": {
             "get": {
-                "description": "根据关键词搜索课程",
+                "description": "根据关键词[教师或者课程名]搜索课程",
                 "produces": [
                     "application/json"
                 ],
@@ -965,21 +965,21 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "区域，例如 '东区学生宿舍'",
+                        "description": "区域,例如:南湖学生宿舍(看不懂参数请看这个网页https://jnb.ccnu.edu.cn/MobileWebPayStandard_Vue/#/addRoom,前两个参数直接完全一致,后面一个参数只保留了门牌号)",
                         "name": "area",
                         "in": "query",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "楼栋，例如 '1号楼'",
+                        "description": "建筑,例如:南湖05栋",
                         "name": "building",
                         "in": "query",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "房间号，例如 '101'",
+                        "description": "房间号,例如:414",
                         "name": "room",
                         "in": "query",
                         "required": true
@@ -1141,7 +1141,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "清除指定用户的feed订阅事件,feedid有三种状态0表示全部清除(不加参数默认为0),-1表示清除已读,指定feedid表示只清除这个id的feed消息",
+                "description": "清除指定用户的feed订阅事件,都是可选字段",
                 "consumes": [
                     "application/json"
                 ],
@@ -1690,7 +1690,7 @@ const docTemplate = `{
             }
         },
         "/feedback_help/findQuestionsByName": {
-            "post": {
+            "get": {
                 "description": "对常见问题进行模糊搜索",
                 "consumes": [
                     "application/json"
@@ -2445,7 +2445,10 @@ const docTemplate = `{
                 },
                 "weeks": {
                     "description": "哪些周",
-                    "type": "integer"
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 },
                 "where": {
                     "description": "地点",
@@ -2454,20 +2457,6 @@ const docTemplate = `{
                 "year": {
                     "description": "学年",
                     "type": "string"
-                }
-            }
-        },
-        "class.Class": {
-            "type": "object",
-            "properties": {
-                "info": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/class.ClassInfo"
-                    }
-                },
-                "thisweek": {
-                    "type": "boolean"
                 }
             }
         },
@@ -2508,7 +2497,10 @@ const docTemplate = `{
                 },
                 "weeks": {
                     "description": "哪些周",
-                    "type": "integer"
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 },
                 "where": {
                     "description": "上课地点",
@@ -2540,11 +2532,11 @@ const docTemplate = `{
         "class.GetClassListRequest": {
             "type": "object",
             "properties": {
+                "refresh": {
+                    "type": "boolean"
+                },
                 "semester": {
                     "type": "string"
-                },
-                "week": {
-                    "type": "integer"
                 },
                 "year": {
                     "type": "string"
@@ -2557,7 +2549,7 @@ const docTemplate = `{
                 "classes": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/class.Class"
+                        "$ref": "#/definitions/class.ClassInfo"
                     }
                 }
             }
@@ -2660,7 +2652,10 @@ const docTemplate = `{
                 },
                 "weeks": {
                     "description": "哪些周",
-                    "type": "integer"
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 },
                 "where": {
                     "description": "地点",
@@ -2812,7 +2807,12 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "feed_id": {
+                    "description": "如果feedid和status都被填写了,那么就会清除当前的feedid代表的feed消息且状态为设置的status的",
                     "type": "integer"
+                },
+                "status": {
+                    "description": "有三个可选字段all表示清除所有消息,read表示清除所有已读消息,unread表示清除所有未读消息",
+                    "type": "string"
                 }
             }
         },
@@ -2823,6 +2823,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "created_at": {
+                    "description": "Unix时间戳",
                     "type": "integer"
                 },
                 "extend_fields": {
@@ -2897,6 +2898,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "extend_fields": {
+                    "description": "自定义拓展字段",
                     "type": "object",
                     "additionalProperties": {
                         "type": "string"
@@ -2906,6 +2908,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "public_time": {
+                    "description": "发布的时间",
                     "type": "integer"
                 },
                 "title": {
@@ -2926,6 +2929,7 @@ const docTemplate = `{
                     }
                 },
                 "later_time": {
+                    "description": "延迟多久发布(单位是秒)",
                     "type": "integer"
                 },
                 "title": {

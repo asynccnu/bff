@@ -3,7 +3,6 @@ package class
 type GetClassListRequest struct {
 	Year     string `form:"year"`
 	Semester string `form:"semester"`
-	Week     int64  `form:"week"`
 	Refresh  bool   `form:"refresh"`
 }
 

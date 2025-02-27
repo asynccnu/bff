@@ -26,7 +26,7 @@ func (h *FeedbackHelpHandler) RegisterRoutes(s *gin.RouterGroup, authMiddleware 
 	sg.POST("/createQuestion", authMiddleware, ginx.WrapClaimsAndReq(h.CreateQuestion))
 	sg.POST("/changeQuestion", authMiddleware, ginx.WrapClaimsAndReq(h.ChangeQuestion))
 	sg.POST("/deleteQuestion", authMiddleware, ginx.WrapClaimsAndReq(h.DeleteQuestion))
-	sg.POST("/findQuestionsByName", authMiddleware, ginx.WrapReq(h.FindQuestionsByName))
+	sg.GET("/findQuestionsByName", authMiddleware, ginx.WrapReq(h.FindQuestionsByName))
 	sg.POST("/noteQuestion", authMiddleware, ginx.WrapReq(h.NoteQuestion))
 }
 
@@ -151,7 +151,7 @@ func (h *FeedbackHelpHandler) DeleteQuestion(c *gin.Context, req DeleteQuestionR
 // @Param question query string true "问题名称"
 // @Success 200 {object} web.Response{date=FindQuestionsByNameResp} "成功"
 // @Failure 500 {object} web.Response "系统异常"
-// @Router /feedback_help/findQuestionsByName [post]
+// @Router /feedback_help/findQuestionsByName [get]
 func (h *FeedbackHelpHandler) FindQuestionsByName(c *gin.Context, req FindQuestionsByNameReq) (web.Response, error) {
 	q, err := h.FeedbackHelpClient.FindQuestionByName(c, &feedback_helpv1.FindQuestionByNameRequest{
 		Question: req.Question,

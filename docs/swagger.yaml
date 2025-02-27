@@ -111,22 +111,15 @@ definitions:
         type: string
       weeks:
         description: 哪些周
-        type: integer
+        items:
+          type: integer
+        type: array
       where:
         description: 地点
         type: string
       year:
         description: 学年
         type: string
-    type: object
-  class.Class:
-    properties:
-      info:
-        items:
-          $ref: '#/definitions/class.ClassInfo'
-        type: array
-      thisweek:
-        type: boolean
     type: object
   class.ClassInfo:
     properties:
@@ -156,7 +149,9 @@ definitions:
         type: string
       weeks:
         description: 哪些周
-        type: integer
+        items:
+          type: integer
+        type: array
       where:
         description: 上课地点
         type: string
@@ -178,10 +173,10 @@ definitions:
     type: object
   class.GetClassListRequest:
     properties:
+      refresh:
+        type: boolean
       semester:
         type: string
-      week:
-        type: integer
       year:
         type: string
     type: object
@@ -189,7 +184,7 @@ definitions:
     properties:
       classes:
         items:
-          $ref: '#/definitions/class.Class'
+          $ref: '#/definitions/class.ClassInfo'
         type: array
     type: object
   class.GetRecycleBinClassInfosResp:
@@ -260,7 +255,9 @@ definitions:
         type: string
       weeks:
         description: 哪些周
-        type: integer
+        items:
+          type: integer
+        type: array
       where:
         description: 地点
         type: string
@@ -359,13 +356,18 @@ definitions:
   feed.ClearFeedEventReq:
     properties:
       feed_id:
+        description: 如果feedid和status都被填写了,那么就会清除当前的feedid代表的feed消息且状态为设置的status的
         type: integer
+      status:
+        description: 有三个可选字段all表示清除所有消息,read表示清除所有已读消息,unread表示清除所有未读消息
+        type: string
     type: object
   feed.FeedEvent:
     properties:
       content:
         type: string
       created_at:
+        description: Unix时间戳
         type: integer
       extend_fields:
         additionalProperties:
@@ -416,10 +418,12 @@ definitions:
       extend_fields:
         additionalProperties:
           type: string
+        description: 自定义拓展字段
         type: object
       id:
         type: string
       public_time:
+        description: 发布的时间
         type: integer
       title:
         type: string
@@ -433,6 +437,7 @@ definitions:
           type: string
         type: object
       later_time:
+        description: 延迟多久发布(单位是秒)
         type: integer
       title:
         type: string
@@ -1095,11 +1100,11 @@ paths:
         name: semester
         required: true
         type: string
-      - description: 当前周
+      - description: 是否强制从华师获取最新版本
         in: query
-        name: week
+        name: refresh
         required: true
-        type: integer
+        type: boolean
       - description: Bearer Token
         in: header
         name: Authorization
@@ -1189,7 +1194,7 @@ paths:
       - 课表
   /class/search:
     get:
-      description: 根据关键词搜索课程
+      description: 根据关键词[教师或者课程名]搜索课程
       parameters:
       - description: 学年
         in: query
@@ -1323,17 +1328,17 @@ paths:
     get:
       description: 根据区域、楼栋和房间号查询电费信息
       parameters:
-      - description: 区域，例如 '东区学生宿舍'
+      - description: 区域,例如:南湖学生宿舍(看不懂参数请看这个网页https://jnb.ccnu.edu.cn/MobileWebPayStandard_Vue/#/addRoom,前两个参数直接完全一致,后面一个参数只保留了门牌号)
         in: query
         name: area
         required: true
         type: string
-      - description: 楼栋，例如 '1号楼'
+      - description: 建筑,例如:南湖05栋
         in: query
         name: building
         required: true
         type: string
-      - description: 房间号，例如 '101'
+      - description: 房间号,例如:414
         in: query
         name: room
         required: true
@@ -1430,7 +1435,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: 清除指定用户的feed订阅事件,feedid有三种状态0表示全部清除(不加参数默认为0),-1表示清除已读,指定feedid表示只清除这个id的feed消息
+      description: 清除指定用户的feed订阅事件,都是可选字段
       parameters:
       - description: feed订阅事件ID
         in: body
@@ -1766,7 +1771,7 @@ paths:
       tags:
       - 帮助与反馈
   /feedback_help/findQuestionsByName:
-    post:
+    get:
       consumes:
       - application/json
       description: 对常见问题进行模糊搜索

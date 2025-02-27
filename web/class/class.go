@@ -47,7 +47,7 @@ func (c *ClassHandler) RegisterRoutes(s *gin.RouterGroup, authMiddleware gin.Han
 // @Tags 课表
 // @Param year query string true "学年"
 // @Param semester query string true "学期"
-// @Param week query int true "当前周"
+// @Param refresh query bool true "是否强制从华师获取最新版本"
 // @Produce json
 // @Param Authorization header string true "Bearer Token"
 // @Param request body GetClassListRequest true "获取课表请求参数"
@@ -78,7 +78,7 @@ func (c *ClassHandler) GetClassList(ctx *gin.Context, req GetClassListRequest, u
 			WeekDuration: class.Info.WeekDuration,
 			Classname:    class.Info.Classname,
 			Credit:       class.Info.Credit,
-			Weeks:        convertWeekFromIntToArray(req.Week),
+			Weeks:        convertWeekFromIntToArray(class.Info.Weeks),
 			Semester:     class.Info.Semester,
 			Year:         class.Info.Year,
 		})
@@ -307,23 +307,23 @@ func (c *ClassHandler) SearchClass(ctx *gin.Context, req SearchRequest) (web.Res
 // @Success 200 {object} web.Response{data=GetSchoolDayResp} "成功获取到当前周"
 // @Router /class/day/get [get]
 func (c *ClassHandler) GetSchoolDay(ctx *gin.Context, req GetSchoolDayReq) (web.Response, error) {
-	// TODO，转换为Unix时间戳
-	//res, err := c.ClassListClient.GetSchoolDay(ctx, &classlistv1.GetSchoolDayReq{})
-	//if err != nil {
-	//	return web.Response{
-	//		Code: errs.INTERNAL_SERVER_ERROR_CODE,
-	//		Msg:  "系统异常",
-	//	}, errs.TYPE_CHANGE_ERROR(err)
-	//}
+
+	res, err := c.ClassListClient.GetSchoolDay(ctx, &classlistv1.GetSchoolDayReq{})
+	if err != nil {
+		return web.Response{
+			Code: errs.INTERNAL_SERVER_ERROR_CODE,
+			Msg:  "系统异常",
+		}, errs.TYPE_CHANGE_ERROR(err)
+	}
 	//加载 "Asia/Shanghai" 时区
 
 	loc, _ := time.LoadLocation("Asia/Shanghai")
-	holiday, err := time.ParseInLocation("2006-01-02", "2025-02-17", loc)
+	holiday, err := time.ParseInLocation("2006-01-02", res.GetHolidayTime(), loc)
 	if err != nil {
 		return web.Response{}, nil
 	}
 
-	school, err := time.ParseInLocation("2006-01-02", "2025-06-22", loc)
+	school, err := time.ParseInLocation("2006-01-02", res.GetSchoolTime(), loc)
 	if err != nil {
 		return web.Response{}, nil
 	}

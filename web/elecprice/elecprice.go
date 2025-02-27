@@ -30,9 +30,9 @@ func (h *ElecPriceHandler) RegisterRoutes(s *gin.RouterGroup, authMiddleware gin
 // @Summary 查询电费
 // @Description 根据区域、楼栋和房间号查询电费信息
 // @Tags 电费
-// @Param area query string true "区域，例如 '东区学生宿舍'"
-// @Param building query string true "楼栋，例如 '1号楼'"
-// @Param room query string true "房间号，例如 '101'"
+// @Param area query string true "区域,例如:南湖学生宿舍(看不懂参数请看这个网页https://jnb.ccnu.edu.cn/MobileWebPayStandard_Vue/#/addRoom,前两个参数直接完全一致,后面一个参数只保留了门牌号)"
+// @Param building query string true "建筑,例如:南湖05栋"
+// @Param room query string true "房间号,例如:414"
 // @Produce json
 // @Success 200 {object} web.Response{data=CheckResponse} "成功返回电费信息"
 // @Failure 500 {object} web.Response{msg=string} "系统异常"
