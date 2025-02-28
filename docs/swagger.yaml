@@ -362,7 +362,7 @@ definitions:
         description: 有三个可选字段all表示清除所有消息,read表示清除所有已读消息,unread表示清除所有未读消息
         type: string
     type: object
-  feed.FeedEvent:
+  feed.FeedEventVO:
     properties:
       content:
         type: string
@@ -375,6 +375,8 @@ definitions:
         type: object
       id:
         type: integer
+      read:
+        type: boolean
       title:
         type: string
       type:
@@ -395,13 +397,9 @@ definitions:
     type: object
   feed.GetFeedEventsResp:
     properties:
-      read_events:
+      feed_events:
         items:
-          $ref: '#/definitions/feed.FeedEvent'
-        type: array
-      unread_events:
-        items:
-          $ref: '#/definitions/feed.FeedEvent'
+          $ref: '#/definitions/feed.FeedEventVO'
         type: array
     type: object
   feed.GetToBePublicMuxiOfficialMSGResp:

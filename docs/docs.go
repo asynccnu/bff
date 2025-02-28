@@ -2816,7 +2816,7 @@ const docTemplate = `{
                 }
             }
         },
-        "feed.FeedEvent": {
+        "feed.FeedEventVO": {
             "type": "object",
             "properties": {
                 "content": {
@@ -2834,6 +2834,9 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
+                },
+                "read": {
+                    "type": "boolean"
                 },
                 "title": {
                     "type": "string"
@@ -2866,16 +2869,10 @@ const docTemplate = `{
         "feed.GetFeedEventsResp": {
             "type": "object",
             "properties": {
-                "read_events": {
+                "feed_events": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/feed.FeedEvent"
-                    }
-                },
-                "unread_events": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/feed.FeedEvent"
+                        "$ref": "#/definitions/feed.FeedEventVO"
                     }
                 }
             }

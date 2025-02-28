@@ -2805,7 +2805,7 @@
                 }
             }
         },
-        "feed.FeedEvent": {
+        "feed.FeedEventVO": {
             "type": "object",
             "properties": {
                 "content": {
@@ -2823,6 +2823,9 @@
                 },
                 "id": {
                     "type": "integer"
+                },
+                "read": {
+                    "type": "boolean"
                 },
                 "title": {
                     "type": "string"
@@ -2855,16 +2858,10 @@
         "feed.GetFeedEventsResp": {
             "type": "object",
             "properties": {
-                "read_events": {
+                "feed_events": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/feed.FeedEvent"
-                    }
-                },
-                "unread_events": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/feed.FeedEvent"
+                        "$ref": "#/definitions/feed.FeedEventVO"
                     }
                 }
             }

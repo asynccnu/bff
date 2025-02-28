@@ -1,8 +1,7 @@
 package feed
 
 type GetFeedEventsResp struct {
-	ReadEvents   []FeedEvent `json:"read_events"`
-	UnreadEvents []FeedEvent `json:"unread_events"`
+	FeedEvents []FeedEventVO `json:"feed_events"`
 }
 
 type FeedEvent struct {
@@ -13,7 +12,15 @@ type FeedEvent struct {
 	CreatedAt    int64             `json:"created_at"` //Unix时间戳
 	ExtendFields map[string]string `json:"extend_fields"`
 }
-
+type FeedEventVO struct {
+	Id           int64             `json:"id"`
+	Title        string            `json:"title"`
+	Type         string            `json:"type"`
+	Content      string            `json:"content"`
+	CreatedAt    int64             `json:"created_at"` //Unix时间戳
+	ExtendFields map[string]string `json:"extend_fields"`
+	Read         bool              `json:"read"`
+}
 type MuxiOfficialMSG struct {
 	Title        string            `json:"title"`
 	Content      string            `json:"content"`

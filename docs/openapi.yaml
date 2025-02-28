@@ -623,19 +623,20 @@ paths:
       parameters:
       - name: area
         in: query
-        description: 区域，例如 '东区学生宿舍'
+        description: "区域,例如:南湖学生宿舍(看不懂参数请看这个网页https://jnb.ccnu.edu.cn/MobileWebPayStandard_Vue/#/addRoom,前\
+          两个参数直接完全一致,后面一个参数只保留了门牌号)"
         required: true
         schema:
           type: string
       - name: building
         in: query
-        description: 楼栋，例如 '1号楼'
+        description: "建筑,例如:南湖05栋"
         required: true
         schema:
           type: string
       - name: room
         in: query
-        description: 房间号，例如 '101'
+        description: "房间号,例如:414"
         required: true
         schema:
           type: string
@@ -733,8 +734,7 @@ paths:
       tags:
       - feed订阅
       summary: 清除feed订阅事件
-      description: "清除指定用户的feed订阅事件,feedid有三种状态0表示全部清除(不加参数默认为0),-1表示清除已读,指定feedid表\
-        示只清除这个id的feed消息"
+      description: "清除指定用户的feed订阅事件,都是可选字段"
       requestBody:
         description: feed订阅事件ID
         content:
@@ -1086,7 +1086,7 @@ paths:
                 $ref: '#/components/schemas/web.Response'
       x-codegen-request-body-name: data
   /feedback_help/findQuestionsByName:
-    post:
+    get:
       tags:
       - 帮助与反馈
       summary: 搜取问题
@@ -1801,6 +1801,7 @@ components:
       properties:
         feed_id:
           type: integer
+          description: "如果feedid和status都被填写了,那么就会清除当前的feedid代表的feed消息且状态为设置的status的"
         status:
           type: string
           description: "有三个可选字段all表示清除所有消息,read表示清除所有已读消息,unread表示清除所有未读消息"
@@ -1822,17 +1823,6 @@ components:
           type: string
         type:
           type: string
-    feed.FeedEventList:
-      type: object
-      properties:
-        read:
-          type: array
-          items:
-            $ref: '#/components/schemas/feed.FeedEvent'
-        unread:
-          type: array
-          items:
-            $ref: '#/components/schemas/feed.FeedEvent'
     feed.GetFeedAllowListResp:
       type: object
       properties:
@@ -1849,10 +1839,14 @@ components:
     feed.GetFeedEventsResp:
       type: object
       properties:
-        feedEvents:
-          type: object
-          additionalProperties:
-            $ref: '#/components/schemas/feed.FeedEventList'
+        read_events:
+          type: array
+          items:
+            $ref: '#/components/schemas/feed.FeedEvent'
+        unread_events:
+          type: array
+          items:
+            $ref: '#/components/schemas/feed.FeedEvent'
     feed.GetToBePublicMuxiOfficialMSGResp:
       type: object
       properties:
