@@ -1805,7 +1805,7 @@ components:
         status:
           type: string
           description: "有三个可选字段all表示清除所有消息,read表示清除所有已读消息,unread表示清除所有未读消息"
-    feed.FeedEvent:
+    feed.FeedEventVO:
       type: object
       properties:
         content:
@@ -1819,6 +1819,8 @@ components:
             type: string
         id:
           type: integer
+        read:
+          type: boolean
         title:
           type: string
         type:
@@ -1839,14 +1841,10 @@ components:
     feed.GetFeedEventsResp:
       type: object
       properties:
-        read_events:
+        feed_events:
           type: array
           items:
-            $ref: '#/components/schemas/feed.FeedEvent'
-        unread_events:
-          type: array
-          items:
-            $ref: '#/components/schemas/feed.FeedEvent'
+            $ref: '#/components/schemas/feed.FeedEventVO'
     feed.GetToBePublicMuxiOfficialMSGResp:
       type: object
       properties:

@@ -45,14 +45,21 @@ func InitGinServer(
 	metrics *metrics.MetricsHandler,
 ) *gin.Engine {
 	//初始化一个gin引擎
-	engine := gin.Default()
+	engine := gin.New()
+	//全局使用gin中间件
+	engine.Use(gin.Recovery())
 	api := engine.Group("/api/v1")
 
 	//在所有的中间件之前进行打点路由的注册(这里是给Prometheus读取用的路由),中间件可能导致其失效所以放在最前面
 	api.GET("/metrics", gin.WrapH(promhttp.Handler()))
-	//使用全局中间件
+
+	//使用中间件
 	api.Use(
+		//gin的默认日志
+		gin.Logger(),
+		//跨域中间件
 		corsMiddleware.MiddlewareFunc(),
+		//打点和错误处理中间件
 		loggerMiddleware.MiddlewareFunc(),
 	)
 
