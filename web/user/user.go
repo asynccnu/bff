@@ -104,10 +104,10 @@ func (h *UserHandler) RefreshToken(ctx *gin.Context) (web.Response, error) {
 		return h.RCJWTKey(), nil
 	})
 	if err != nil {
-		return web.Response{}, errs.JWT_SYSTEM_ERROR(err)
+		return web.Response{}, errs.AUTH_PASSED_ERROR(err)
 	}
 	if token == nil || !token.Valid {
-		return web.Response{}, errs.JWT_SYSTEM_ERROR(err)
+		return web.Response{}, errs.UNAUTHORIED_ERROR(err)
 	}
 	ok, err := h.CheckSession(ctx, rc.Ssid)
 	if err != nil || ok {

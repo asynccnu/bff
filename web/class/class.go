@@ -257,7 +257,6 @@ func (c *ClassHandler) RecoverClass(ctx *gin.Context, req RecoverClassRequest, u
 // @Param searchKeyWords query string true "搜索关键词"
 // @Produce json
 // @Param Authorization header string true "Bearer Token"
-// @Param body body SearchRequest true "搜索课程请求"
 // @Success 200 {object} web.Response{data=SearchClassResp} "成功搜索到课程"
 // @Router /class/search [get]
 func (c *ClassHandler) SearchClass(ctx *gin.Context, req SearchRequest) (web.Response, error) {

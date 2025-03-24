@@ -781,15 +781,6 @@ const docTemplate = `{
                         "name": "Authorization",
                         "in": "header",
                         "required": true
-                    },
-                    {
-                        "description": "搜索课程请求",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/class.SearchRequest"
-                        }
                     }
                 ],
                 "responses": {
@@ -2601,21 +2592,6 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/class.ClassInfo"
                     }
-                }
-            }
-        },
-        "class.SearchRequest": {
-            "type": "object",
-            "properties": {
-                "searchKeyWords": {
-                    "description": "搜索关键词,匹配的是课程名称和教师姓名",
-                    "type": "string"
-                },
-                "semester": {
-                    "type": "string"
-                },
-                "year": {
-                    "type": "string"
                 }
             }
         },

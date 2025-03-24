@@ -220,16 +220,6 @@ definitions:
           $ref: '#/definitions/class.ClassInfo'
         type: array
     type: object
-  class.SearchRequest:
-    properties:
-      searchKeyWords:
-        description: 搜索关键词,匹配的是课程名称和教师姓名
-        type: string
-      semester:
-        type: string
-      year:
-        type: string
-    type: object
   class.UpdateClassRequest:
     properties:
       classId:
@@ -1214,12 +1204,6 @@ paths:
         name: Authorization
         required: true
         type: string
-      - description: 搜索课程请求
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/class.SearchRequest'
       produces:
       - application/json
       responses:

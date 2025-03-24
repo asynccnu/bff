@@ -8,25 +8,21 @@ import (
 // TODO 细化错误码,根据错误类型区分不同的错误码
 // 现在这个错误码基本上是随便写的,因为微服务的错误码非常之多暂时没时间细化,所有的都先默认系统错误
 
-const (
-	// INTERNAL_SERVER_ERROR_CODE 一个非常含糊的错误码。代表系统内部错误
-	INTERNAL_SERVER_ERROR_CODE = 500001
-)
-
 // 400
 const (
-	UNAUTHORIED_ERROR_CODE         = 40001
-	BAD_ENTITY_ERROR_CODE          = 40002
-	ROLE_ERROR_CODE                = 40003
-	INVALID_PARAM_VALUE_ERROR_CODE = 40004
+	UNAUTHORIED_ERROR_CODE = iota + 40001
+	BAD_ENTITY_ERROR_CODE
+	ROLE_ERROR_CODE
+	INVALID_PARAM_VALUE_ERROR_CODE
 )
 
 // 500
 const (
-	ERROR_TYPE_ERROR_CODE           = 50001
-	TYPE_CHANGE_ERROR_CODE          = 50002
-	LOGIN_BY_CCNU_ERROR_CODE        = 50003
-	USER_SID_Or_PASSPORD_ERROR_CODE = 50004
+	INTERNAL_SERVER_ERROR_CODE = iota + 50001 // INTERNAL_SERVER_ERROR_CODE 一个非常含糊的错误码。代表系统内部错误
+	ERROR_TYPE_ERROR_CODE
+	TYPE_CHANGE_ERROR_CODE
+	LOGIN_BY_CCNU_ERROR_CODE
+	USER_SID_Or_PASSPORD_ERROR_CODE
 )
 
 // Banner
@@ -302,6 +298,10 @@ var (
 var (
 	UNAUTHORIED_ERROR = func(err error) error {
 		return errorx.New(http.StatusUnauthorized, UNAUTHORIED_ERROR_CODE, "Authorization错误", "authorization", err)
+	}
+
+	AUTH_PASSED_ERROR = func(err error) error {
+		return errorx.New(http.StatusUnauthorized, UNAUTHORIED_ERROR_CODE, "Authorization过期", "authorization", err)
 	}
 
 	JWT_SYSTEM_ERROR = func(err error) error {
