@@ -13,12 +13,12 @@ type Price struct {
 }
 
 type GetAIDandNameRequest struct {
-	AreaName string `json:"area_name,omitempty"`
+	AreaName string `form:"area_name,omitempty"`
 }
 
 type Architecture struct {
-	ArchitectureName string `json:"architecture_name,omitempty" form:"architecture_name,omitempty"`
-	ArchitectureID   string `json:"architecture_id,omitempty" form:"architecture_id,omitempty"`
+	ArchitectureName string `json:"architecture_name,omitempty"`
+	ArchitectureID   string `json:"architecture_id,omitempty"`
 }
 
 type GetAIDandNameResponse struct {
