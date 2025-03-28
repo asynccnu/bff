@@ -130,12 +130,11 @@ func (h *FeedHandler) ChangeFeedAllowList(ctx *gin.Context, req ChangeFeedAllowL
 
 	_, err := h.feedClient.ChangeFeedAllowList(ctx, &feedv1.ChangeFeedAllowListReq{
 		AllowList: &feedv1.AllowList{
-			StudentId:      uc.StudentId,
-			Grade:          req.Grade,
-			Muxi:           req.Muxi,
-			Holiday:        req.Holiday,
-			AirConditioner: req.AirConditioner,
-			Light:          req.Light,
+			StudentId: uc.StudentId,
+			Grade:     req.Grade,
+			Muxi:      req.Muxi,
+			Holiday:   req.Holiday,
+			Energy:    req.Energy,
 		},
 	})
 
@@ -166,11 +165,10 @@ func (h *FeedHandler) GetFeedAllowList(ctx *gin.Context, uc ijwt.UserClaims) (we
 	return web.Response{
 		Msg: "Success",
 		Data: GetFeedAllowListResp{
-			Grade:          allowlist.AllowList.Grade,
-			Muxi:           allowlist.AllowList.Muxi,
-			Holiday:        allowlist.AllowList.Holiday,
-			AirConditioner: allowlist.AllowList.AirConditioner,
-			Light:          allowlist.AllowList.Light,
+			Grade:   allowlist.AllowList.Grade,
+			Muxi:    allowlist.AllowList.Muxi,
+			Holiday: allowlist.AllowList.Holiday,
+			Energy:  allowlist.AllowList.Energy,
 		},
 	}, nil
 }

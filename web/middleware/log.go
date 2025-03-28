@@ -118,6 +118,7 @@ func (lm *LoggerMiddleware) handleResponse(ctx *gin.Context) (web.Response, int)
 		lm.commonInfo(ctx)
 		res = ginx.GetResp[web.Response](ctx)
 	}
+
 	//用来保证gin中间件实现404的时候也能有消息提示
 	if httpCode == http.StatusNotFound {
 		res.Msg = "不存在的路由或请求方法!"
