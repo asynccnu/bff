@@ -39,19 +39,17 @@ type ReadFeedEventReq struct {
 }
 
 type ChangeFeedAllowListReq struct {
-	Grade          bool `json:"grade"`
-	Muxi           bool `json:"muxi"`
-	Holiday        bool `json:"holiday"`
-	AirConditioner bool `json:"air_conditioner"`
-	Light          bool `json:"light"`
+	Grade   bool `json:"grade"`
+	Muxi    bool `json:"muxi"`
+	Holiday bool `json:"holiday"`
+	Energy  bool `json:"energy"`
 }
 
 type GetFeedAllowListResp struct {
-	Grade          bool `json:"grade"`
-	Muxi           bool `json:"muxi"`
-	Holiday        bool `json:"holiday"`
-	AirConditioner bool `json:"air_conditioner"`
-	Light          bool `json:"light"`
+	Grade   bool `json:"grade"`
+	Muxi    bool `json:"muxi"`
+	Holiday bool `json:"holiday"`
+	Energy  bool `json:"energy"`
 }
 type ChangeElectricityStandardReq struct {
 	ElectricityStandard bool `json:"electricity_standard"`
