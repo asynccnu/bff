@@ -1,25 +1,19 @@
 package elecprice
 
 type SetStandardRequest struct {
-	Money    int64  `json:"money,omitempty"`    //金额
-	Area     string `json:"area,omitempty"`     //区域
-	Building string `json:"building,omitempty"` //建筑
-	Room     string `json:"room,omitempty"`     //房间号
-	LightID  string `json:"light_id,omitempty"` // 灯ID
-	AirID    string `json:"air_id,omitempty"`   // 空调ID
+	RoomName string `json:"room_name,omitempty"`
+	RoomId   string `json:"room_id,omitempty"`
+	Limit    int64  `json:"limit,omitempty"`
 }
 
 type Price struct {
-	LightingRemainMoney       string `json:"lighting_remain_money,omitempty"`
-	LightingYesterdayUseValue string `json:"lighting_yesterday_use_value,omitempty"`
-	LightingYesterdayUseMoney string `json:"lighting_yesterday_use_money,omitempty"`
-	AirRemainMoney            string `json:"air_remain_money,omitempty"`
-	AirYesterdayUseValue      string `json:"air_yesterday_use_value,omitempty"`
-	AirYesterdayUseMoney      string `json:"air_yesterday_use_money,omitempty"`
+	RemainMoney       string `json:"remain_money,omitempty"`
+	YesterdayUseValue string `json:"yesterday_use_value,omitempty"`
+	YesterdayUseMoney string `json:"yesterday_use_money,omitempty"`
 }
 
 type GetAIDandNameRequest struct {
-	AreaName string `json:"area_name,omitempty"`
+	AreaName string `form:"area_name,omitempty"`
 }
 
 type Architecture struct {
@@ -32,8 +26,8 @@ type GetAIDandNameResponse struct {
 }
 
 type GetRoomInfoRequest struct {
-	ArchitectureID string `json:"architecture_id,omitempty"`
-	Floor          string `json:"floor,omitempty"`
+	ArchitectureID string `json:"architecture_id,omitempty" form:"architecture_id,omitempty"`
+	Floor          string `json:"floor,omitempty" form:"floor,omitempty"`
 }
 
 type Room struct {
@@ -46,10 +40,31 @@ type GetRoomInfoResponse struct {
 }
 
 type GetPriceRequest struct {
-	RoomAircID  string `json:"room_airc_id,omitempty"`
-	RoomLightID string `json:"room_light_id,omitempty"`
+	RoomId string `json:"room_id,omitempty" form:"room_id,omitempty"`
 }
 
 type GetPriceResponse struct {
 	Price *Price `json:"price,omitempty"`
+}
+
+type GetStandardListRequest struct {
+	StudentId string `json:"student_id,omitempty" form:"student_id,omitempty"`
+}
+
+type Standard struct {
+	RoomName string `json:"room_name,omitempty"`
+	RoomId   string `json:"room_id,omitempty"`
+	Limit    int64  `json:"limit,omitempty"`
+}
+
+type StandardResp struct {
+	RoomName string `json:"room_name,omitempty"`
+	Limit    int64  `json:"limit,omitempty"`
+}
+type GetStandardListResponse struct {
+	StandardList []*StandardResp `json:"standard_list,omitempty"`
+}
+
+type CancelStandardRequest struct {
+	RoomId string `json:"room_id,omitempty"`
 }

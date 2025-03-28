@@ -139,6 +139,14 @@ var (
 	ELECPRICE_SET_STANDARD_ERROR = func(err error) error {
 		return errorx.New(http.StatusInternalServerError, INTERNAL_SERVER_ERROR_CODE, "设置电费提醒标准失败!", "elecprice", err)
 	}
+
+	ELECPRICE_GET_STANDARD_LIST_ERROR = func(err error) error {
+		return errorx.New(http.StatusInternalServerError, INTERNAL_SERVER_ERROR_CODE, "获取电费提醒标准失败!", "elecprice", err)
+	}
+
+	ELECPRICE_CANCEL_STANDARD_ERROR = func(err error) error {
+		return errorx.New(http.StatusInternalServerError, INTERNAL_SERVER_ERROR_CODE, "取消电费提醒标准失败!", "elecprice", err)
+	}
 )
 
 // Feed

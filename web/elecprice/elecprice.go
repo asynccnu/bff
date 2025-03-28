@@ -22,22 +22,24 @@ func NewElecPriceHandler(elecPriceClient elecpricev1.ElecpriceServiceClient,
 func (h *ElecPriceHandler) RegisterRoutes(s *gin.RouterGroup, authMiddleware gin.HandlerFunc) {
 	sg := s.Group("/elecprice")
 	{
-		sg.POST("/getAIDandName", authMiddleware, ginx.WrapClaimsAndReq(h.GetAIDandName))
+		sg.GET("/getAIDandName", authMiddleware, ginx.WrapClaimsAndReq(h.GetAIDandName))
+		sg.GET("/getRoomInfo", authMiddleware, ginx.WrapClaimsAndReq(h.GetRoomInfo))
+		sg.GET("/getPrice", authMiddleware, ginx.WrapClaimsAndReq(h.GetPrice))
+
 		sg.POST("/setStandard", authMiddleware, ginx.WrapClaimsAndReq(h.SetStandard))
-		sg.POST("/getRoomInfo", authMiddleware, ginx.WrapClaimsAndReq(h.GetRoomInfo))
-		sg.POST("/getPrice", authMiddleware, ginx.WrapClaimsAndReq(h.GetPrice))
+		sg.GET("/getStandardList", authMiddleware, ginx.WrapClaimsAndReq(h.GetStandardList))
+		sg.POST("/cancelStandard", authMiddleware, ginx.WrapClaimsAndReq(h.CancelStandard))
 	}
 }
 
 // @Summary 获取楼栋和房间号
 // @Description 通过区域获取楼栋和房间号
 // @Tags 电费
-// @Accept json
 // @Produce json
-// @Param request body elecprice.GetAIDandNameRequest true "设置电费提醒请求参数"
+// @Param request query elecprice.GetAIDandNameRequest true "设置电费提醒请求参数"
 // @Success 200 {object} web.Response{msg=elecprice.GetAIDandNameResponse} "设置成功的返回信息"
 // @Failure 500 {object} web.Response{msg=string} "系统异常"
-// @Router /elecprice/getAIDandName [post]
+// @Router /elecprice/getAIDandName [get]
 func (h *ElecPriceHandler) GetAIDandName(ctx *gin.Context, req GetAIDandNameRequest, uc ijwt.UserClaims) (web.Response, error) {
 	res, err := h.ElecPriceClient.GetAIDandName(ctx, &elecpricev1.GetAIDandNameRequest{
 		AreaName: req.AreaName,
@@ -62,12 +64,11 @@ func (h *ElecPriceHandler) GetAIDandName(ctx *gin.Context, req GetAIDandNameRequ
 // @Summary 获取房间号和id
 // @Description 根据房间号和空调/照明id
 // @Tags 电费
-// @Accept json
 // @Produce json
-// @Param request body elecprice.GetRoomInfoRequest true "获取楼栋信息请求参数"
+// @Param request query elecprice.GetRoomInfoRequest true "获取楼栋信息请求参数"
 // @Success 200 {object} web.Response{msg=elecprice.GetRoomInfoResponse} "获取成功的返回信息"
 // @Failure 500 {object} web.Response{msg=string} "系统异常"
-// @Router /elecprice/getRoomInfo [post]
+// @Router /elecprice/getRoomInfo [get]
 func (h *ElecPriceHandler) GetRoomInfo(ctx *gin.Context, req GetRoomInfoRequest, uc ijwt.UserClaims) (web.Response, error) {
 	res, err := h.ElecPriceClient.GetRoomInfo(ctx, &elecpricev1.GetRoomInfoRequest{
 		ArchitectureID: req.ArchitectureID,
@@ -93,16 +94,14 @@ func (h *ElecPriceHandler) GetRoomInfo(ctx *gin.Context, req GetRoomInfoRequest,
 // @Summary 获取电费
 // @Description 根据房间号获取电费信息
 // @Tags 电费
-// @Accept json
 // @Produce json
-// @Param request body elecprice.GetPriceRequest true "获取电费请求参数"
+// @Param request query elecprice.GetPriceRequest true "获取电费请求参数"
 // @Success 200 {object} web.Response{msg=elecprice.GetPriceResponse} "获取成功的返回信息"
 // @Failure 500 {object} web.Response{msg=string} "系统异常"
-// @Router /elecprice/getPrice [post]
+// @Router /elecprice/getPrice [get]
 func (h *ElecPriceHandler) GetPrice(ctx *gin.Context, req GetPriceRequest, uc ijwt.UserClaims) (web.Response, error) {
 	res, err := h.ElecPriceClient.GetPrice(ctx, &elecpricev1.GetPriceRequest{
-		RoomAircID:  req.RoomAircID,
-		RoomLightID: req.RoomLightID,
+		RoomId: req.RoomId,
 	})
 	if err != nil {
 		return web.Response{}, errs.ELECPRICE_SET_STANDARD_ERROR(err)
@@ -110,12 +109,9 @@ func (h *ElecPriceHandler) GetPrice(ctx *gin.Context, req GetPriceRequest, uc ij
 	return web.Response{
 		Data: GetPriceResponse{
 			Price: &Price{
-				LightingRemainMoney:       res.Price.LightingRemainMoney,
-				LightingYesterdayUseValue: res.Price.LightingYesterdayUseValue,
-				LightingYesterdayUseMoney: res.Price.LightingYesterdayUseMoney,
-				AirRemainMoney:            res.Price.AirRemainMoney,
-				AirYesterdayUseValue:      res.Price.AirYesterdayUseValue,
-				AirYesterdayUseMoney:      res.Price.AirYesterdayUseMoney,
+				RemainMoney:       res.Price.RemainMoney,
+				YesterdayUseValue: res.Price.YesterdayUseValue,
+				YesterdayUseMoney: res.Price.YesterdayUseMoney,
 			},
 		},
 	}, nil
@@ -132,13 +128,12 @@ func (h *ElecPriceHandler) GetPrice(ctx *gin.Context, req GetPriceRequest, uc ij
 // @Failure 500 {object} web.Response{msg=string} "系统异常"
 // @Router /elecprice/setStandard [post]
 func (h *ElecPriceHandler) SetStandard(ctx *gin.Context, req SetStandardRequest, uc ijwt.UserClaims) (web.Response, error) {
-
 	_, err := h.ElecPriceClient.SetStandard(ctx, &elecpricev1.SetStandardRequest{
 		StudentId: uc.StudentId,
-		Money:     req.Money,
-		Ids: &elecpricev1.SetStandardRequest_IDs{
-			RoomAircID:  req.AirID,
-			RoomLightID: req.LightID,
+		Standard: &elecpricev1.Standard{
+			Limit:    req.Limit,
+			RoomName: req.RoomName,
+			RoomId:   req.RoomId,
 		},
 	})
 	if err != nil {
@@ -150,8 +145,55 @@ func (h *ElecPriceHandler) SetStandard(ctx *gin.Context, req SetStandardRequest,
 	}, nil
 }
 
-// 这个方法是用来检查是否是管理员的,虽然我觉得写的不好把管理员写死在代码里面了,但是先凑合着用,之后再改,具体怎么使用请随便去别的服务里面找一找
-func (h *ElecPriceHandler) isAdmin(studentId string) bool {
-	_, exists := h.Administrators[studentId]
-	return exists
+// @Summary 获取电费提醒标准
+// @Description 获取自己订阅的电费提醒标准
+// @Tags 电费
+// @Produce json
+// @Success 200 {object} web.Response{msg=elecprice.GetStandardListResponse} "获取成功的返回信息"
+// @Failure 500 {object} web.Response{msg=string} "系统异常"
+// @Router /elecprice/getStandardList [get]
+func (h *ElecPriceHandler) GetStandardList(ctx *gin.Context, req GetStandardListRequest, uc ijwt.UserClaims) (web.Response, error) {
+	res, err := h.ElecPriceClient.GetStandardList(ctx, &elecpricev1.GetStandardListRequest{
+		StudentId: uc.StudentId,
+	})
+	if err != nil {
+		return web.Response{}, errs.ELECPRICE_GET_STANDARD_LIST_ERROR(err)
+	}
+
+	var standards []*StandardResp
+	for _, s := range res.Standards {
+		standards = append(standards, &StandardResp{
+			Limit:    s.Limit,
+			RoomName: s.RoomName,
+		})
+	}
+
+	return web.Response{
+		Data: GetStandardListResponse{
+			StandardList: standards,
+		},
+	}, nil
+}
+
+// @Summary 取消电费提醒标准
+// @Description 取消自己订阅的电费提醒
+// @Tags 电费
+// @Accept json
+// @Produce json
+// @Param request body elecprice.CancelStandardRequest true "取消电费提醒请求参数"
+// @Success 200 {object} web.Response{msg=string} "取消成功的返回信息"
+// @Failure 500 {object} web.Response{msg=string} "系统异常"
+// @Router /elecprice/cancelStandard [post]
+func (h *ElecPriceHandler) CancelStandard(ctx *gin.Context, req CancelStandardRequest, uc ijwt.UserClaims) (web.Response, error) {
+	_, err := h.ElecPriceClient.CancelStandard(ctx, &elecpricev1.CancelStandardRequest{
+		StudentId: uc.StudentId,
+		RoomId:    req.RoomId,
+	})
+	if err != nil {
+		return web.Response{}, errs.ELECPRICE_CANCEL_STANDARD_ERROR(err)
+	}
+
+	return web.Response{
+		Msg: "取消电费提醒标准成功!",
+	}, nil
 }
