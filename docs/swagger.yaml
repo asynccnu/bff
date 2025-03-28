@@ -300,9 +300,9 @@ definitions:
       architecture_name:
         type: string
     type: object
-  elecprice.GetAIDandNameRequest:
+  elecprice.CancelStandardRequest:
     properties:
-      area_name:
+      room_id:
         type: string
     type: object
   elecprice.GetAIDandNameResponse:
@@ -312,24 +312,10 @@ definitions:
           $ref: '#/definitions/elecprice.Architecture'
         type: array
     type: object
-  elecprice.GetPriceRequest:
-    properties:
-      room_airc_id:
-        type: string
-      room_light_id:
-        type: string
-    type: object
   elecprice.GetPriceResponse:
     properties:
       price:
         $ref: '#/definitions/elecprice.Price'
-    type: object
-  elecprice.GetRoomInfoRequest:
-    properties:
-      architecture_id:
-        type: string
-      floor:
-        type: string
     type: object
   elecprice.GetRoomInfoResponse:
     properties:
@@ -338,19 +324,20 @@ definitions:
           $ref: '#/definitions/elecprice.Room'
         type: array
     type: object
+  elecprice.GetStandardListResponse:
+    properties:
+      standard_list:
+        items:
+          $ref: '#/definitions/elecprice.StandardResp'
+        type: array
+    type: object
   elecprice.Price:
     properties:
-      air_remain_money:
+      remain_money:
         type: string
-      air_yesterday_use_money:
+      yesterday_use_money:
         type: string
-      air_yesterday_use_value:
-        type: string
-      lighting_remain_money:
-        type: string
-      lighting_yesterday_use_money:
-        type: string
-      lighting_yesterday_use_value:
+      yesterday_use_value:
         type: string
     type: object
   elecprice.Room:
@@ -362,23 +349,18 @@ definitions:
     type: object
   elecprice.SetStandardRequest:
     properties:
-      air_id:
-        description: 空调ID
-        type: string
-      area:
-        description: 区域
-        type: string
-      building:
-        description: 建筑
-        type: string
-      light_id:
-        description: 灯ID
-        type: string
-      money:
-        description: 金额
+      limit:
         type: integer
-      room:
-        description: 房间号
+      room_id:
+        type: string
+      room_name:
+        type: string
+    type: object
+  elecprice.StandardResp:
+    properties:
+      limit:
+        type: integer
+      room_name:
         type: string
     type: object
   feed.ChangeFeedAllowListReq:
@@ -1357,18 +1339,49 @@ paths:
       summary: 保存部门信息
       tags:
       - 部门
-  /elecprice/getAIDandName:
+  /elecprice/cancelStandard:
     post:
       consumes:
       - application/json
-      description: 通过区域获取楼栋和房间号
+      description: 取消自己订阅的电费提醒
       parameters:
-      - description: 设置电费提醒请求参数
+      - description: 取消电费提醒请求参数
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/elecprice.GetAIDandNameRequest'
+          $ref: '#/definitions/elecprice.CancelStandardRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 取消成功的返回信息
+          schema:
+            allOf:
+            - $ref: '#/definitions/web.Response'
+            - properties:
+                msg:
+                  type: string
+              type: object
+        "500":
+          description: 系统异常
+          schema:
+            allOf:
+            - $ref: '#/definitions/web.Response'
+            - properties:
+                msg:
+                  type: string
+              type: object
+      summary: 取消电费提醒标准
+      tags:
+      - 电费
+  /elecprice/getAIDandName:
+    get:
+      description: 通过区域获取楼栋和房间号
+      parameters:
+      - in: query
+        name: area_name
+        type: string
       produces:
       - application/json
       responses:
@@ -1394,17 +1407,12 @@ paths:
       tags:
       - 电费
   /elecprice/getPrice:
-    post:
-      consumes:
-      - application/json
+    get:
       description: 根据房间号获取电费信息
       parameters:
-      - description: 获取电费请求参数
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/elecprice.GetPriceRequest'
+      - in: query
+        name: room_id
+        type: string
       produces:
       - application/json
       responses:
@@ -1430,17 +1438,15 @@ paths:
       tags:
       - 电费
   /elecprice/getRoomInfo:
-    post:
-      consumes:
-      - application/json
+    get:
       description: 根据房间号和空调/照明id
       parameters:
-      - description: 获取楼栋信息请求参数
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/elecprice.GetRoomInfoRequest'
+      - in: query
+        name: architecture_id
+        type: string
+      - in: query
+        name: floor
+        type: string
       produces:
       - application/json
       responses:
@@ -1463,6 +1469,33 @@ paths:
                   type: string
               type: object
       summary: 获取房间号和id
+      tags:
+      - 电费
+  /elecprice/getStandardList:
+    get:
+      description: 获取自己订阅的电费提醒标准
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功的返回信息
+          schema:
+            allOf:
+            - $ref: '#/definitions/web.Response'
+            - properties:
+                msg:
+                  $ref: '#/definitions/elecprice.GetStandardListResponse'
+              type: object
+        "500":
+          description: 系统异常
+          schema:
+            allOf:
+            - $ref: '#/definitions/web.Response'
+            - properties:
+                msg:
+                  type: string
+              type: object
+      summary: 获取电费提醒标准
       tags:
       - 电费
   /elecprice/setStandard:

@@ -932,9 +932,9 @@
                 }
             }
         },
-        "/elecprice/getAIDandName": {
+        "/elecprice/cancelStandard": {
             "post": {
-                "description": "通过区域获取楼栋和房间号",
+                "description": "取消自己订阅的电费提醒",
                 "consumes": [
                     "application/json"
                 ],
@@ -944,16 +944,73 @@
                 "tags": [
                     "电费"
                 ],
-                "summary": "获取楼栋和房间号",
+                "summary": "取消电费提醒标准",
                 "parameters": [
                     {
-                        "description": "设置电费提醒请求参数",
+                        "description": "取消电费提醒请求参数",
                         "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/elecprice.GetAIDandNameRequest"
+                            "$ref": "#/definitions/elecprice.CancelStandardRequest"
                         }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "取消成功的返回信息",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/web.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "系统异常",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/web.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/elecprice/getAIDandName": {
+            "get": {
+                "description": "通过区域获取楼栋和房间号",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "电费"
+                ],
+                "summary": "获取楼栋和房间号",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "area_name",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -997,11 +1054,8 @@
             }
         },
         "/elecprice/getPrice": {
-            "post": {
+            "get": {
                 "description": "根据房间号获取电费信息",
-                "consumes": [
-                    "application/json"
-                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1011,13 +1065,9 @@
                 "summary": "获取电费",
                 "parameters": [
                     {
-                        "description": "获取电费请求参数",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/elecprice.GetPriceRequest"
-                        }
+                        "type": "string",
+                        "name": "room_id",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1061,11 +1111,8 @@
             }
         },
         "/elecprice/getRoomInfo": {
-            "post": {
+            "get": {
                 "description": "根据房间号和空调/照明id",
-                "consumes": [
-                    "application/json"
-                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1075,13 +1122,14 @@
                 "summary": "获取房间号和id",
                 "parameters": [
                     {
-                        "description": "获取楼栋信息请求参数",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/elecprice.GetRoomInfoRequest"
-                        }
+                        "type": "string",
+                        "name": "architecture_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "floor",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1097,6 +1145,56 @@
                                     "properties": {
                                         "msg": {
                                             "$ref": "#/definitions/elecprice.GetRoomInfoResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "系统异常",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/web.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/elecprice/getStandardList": {
+            "get": {
+                "description": "获取自己订阅的电费提醒标准",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "电费"
+                ],
+                "summary": "获取电费提醒标准",
+                "responses": {
+                    "200": {
+                        "description": "获取成功的返回信息",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/web.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "msg": {
+                                            "$ref": "#/definitions/elecprice.GetStandardListResponse"
                                         }
                                     }
                                 }
@@ -2821,10 +2919,10 @@
                 }
             }
         },
-        "elecprice.GetAIDandNameRequest": {
+        "elecprice.CancelStandardRequest": {
             "type": "object",
             "properties": {
-                "area_name": {
+                "room_id": {
                     "type": "string"
                 }
             }
@@ -2840,33 +2938,11 @@
                 }
             }
         },
-        "elecprice.GetPriceRequest": {
-            "type": "object",
-            "properties": {
-                "room_airc_id": {
-                    "type": "string"
-                },
-                "room_light_id": {
-                    "type": "string"
-                }
-            }
-        },
         "elecprice.GetPriceResponse": {
             "type": "object",
             "properties": {
                 "price": {
                     "$ref": "#/definitions/elecprice.Price"
-                }
-            }
-        },
-        "elecprice.GetRoomInfoRequest": {
-            "type": "object",
-            "properties": {
-                "architecture_id": {
-                    "type": "string"
-                },
-                "floor": {
-                    "type": "string"
                 }
             }
         },
@@ -2881,25 +2957,27 @@
                 }
             }
         },
+        "elecprice.GetStandardListResponse": {
+            "type": "object",
+            "properties": {
+                "standard_list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/elecprice.StandardResp"
+                    }
+                }
+            }
+        },
         "elecprice.Price": {
             "type": "object",
             "properties": {
-                "air_remain_money": {
+                "remain_money": {
                     "type": "string"
                 },
-                "air_yesterday_use_money": {
+                "yesterday_use_money": {
                     "type": "string"
                 },
-                "air_yesterday_use_value": {
-                    "type": "string"
-                },
-                "lighting_remain_money": {
-                    "type": "string"
-                },
-                "lighting_yesterday_use_money": {
-                    "type": "string"
-                },
-                "lighting_yesterday_use_value": {
+                "yesterday_use_value": {
                     "type": "string"
                 }
             }
@@ -2918,28 +2996,24 @@
         "elecprice.SetStandardRequest": {
             "type": "object",
             "properties": {
-                "air_id": {
-                    "description": "空调ID",
-                    "type": "string"
-                },
-                "area": {
-                    "description": "区域",
-                    "type": "string"
-                },
-                "building": {
-                    "description": "建筑",
-                    "type": "string"
-                },
-                "light_id": {
-                    "description": "灯ID",
-                    "type": "string"
-                },
-                "money": {
-                    "description": "金额",
+                "limit": {
                     "type": "integer"
                 },
-                "room": {
-                    "description": "房间号",
+                "room_id": {
+                    "type": "string"
+                },
+                "room_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "elecprice.StandardResp": {
+            "type": "object",
+            "properties": {
+                "limit": {
+                    "type": "integer"
+                },
+                "room_name": {
                     "type": "string"
                 }
             }
