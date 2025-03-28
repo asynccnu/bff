@@ -16,7 +16,7 @@ type CorsMiddleware struct{}
 func (c *CorsMiddleware) MiddlewareFunc() gin.HandlerFunc {
 	return cors.New(cors.Config{
 		// 允许的请求头
-		AllowHeaders: []string{"Content-ContentType", "Authorization"},
+		AllowHeaders: []string{"Content-Type", "Authorization"},
 		// 添加到响应头去,默认的响应头是不能够显示自定义的部分的
 		ExposeHeaders: []string{"x-jwt-token", "x-refresh-token"},
 		// 是否允许携带凭证（如 Cookies）
