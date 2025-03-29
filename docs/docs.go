@@ -1008,16 +1008,16 @@ const docTemplate = `{
                 }
             }
         },
-        "/elecprice/getAIDandName": {
+        "/elecprice/getArchitecture": {
             "get": {
-                "description": "通过区域获取楼栋和房间号",
+                "description": "通过区域获取楼栋信息",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "电费"
                 ],
-                "summary": "获取楼栋和房间号",
+                "summary": "获取楼栋信息",
                 "parameters": [
                     {
                         "type": "string",
@@ -1037,7 +1037,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "msg": {
-                                            "$ref": "#/definitions/elecprice.GetAIDandNameResponse"
+                                            "$ref": "#/definitions/elecprice.GetArchitectureResponse"
                                         }
                                     }
                                 }
@@ -2928,6 +2928,12 @@ const docTemplate = `{
                 },
                 "architecture_name": {
                     "type": "string"
+                },
+                "base_floor": {
+                    "type": "string"
+                },
+                "top_floor": {
+                    "type": "string"
                 }
             }
         },
@@ -2939,7 +2945,7 @@ const docTemplate = `{
                 }
             }
         },
-        "elecprice.GetAIDandNameResponse": {
+        "elecprice.GetArchitectureResponse": {
             "type": "object",
             "properties": {
                 "architecture_list": {
@@ -3033,16 +3039,13 @@ const docTemplate = `{
         "feed.ChangeFeedAllowListReq": {
             "type": "object",
             "properties": {
-                "air_conditioner": {
+                "energy": {
                     "type": "boolean"
                 },
                 "grade": {
                     "type": "boolean"
                 },
                 "holiday": {
-                    "type": "boolean"
-                },
-                "light": {
                     "type": "boolean"
                 },
                 "muxi": {
@@ -3096,16 +3099,13 @@ const docTemplate = `{
         "feed.GetFeedAllowListResp": {
             "type": "object",
             "properties": {
-                "air_conditioner": {
+                "energy": {
                     "type": "boolean"
                 },
                 "grade": {
                     "type": "boolean"
                 },
                 "holiday": {
-                    "type": "boolean"
-                },
-                "light": {
                     "type": "boolean"
                 },
                 "muxi": {

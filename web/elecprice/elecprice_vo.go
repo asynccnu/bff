@@ -12,16 +12,18 @@ type Price struct {
 	YesterdayUseMoney string `json:"yesterday_use_money,omitempty"`
 }
 
-type GetAIDandNameRequest struct {
-	AreaName string `form:"area_name,omitempty"`
+type GetArchitectureRequest struct {
+	AreaName string `form:"area_name,omitempty" json:"area_name,omitempty"`
 }
 
 type Architecture struct {
 	ArchitectureName string `json:"architecture_name,omitempty"`
 	ArchitectureID   string `json:"architecture_id,omitempty"`
+	BaseFloor        string `json:"base_floor,omitempty"`
+	TopFloor         string `json:"top_floor,omitempty"`
 }
 
-type GetAIDandNameResponse struct {
+type GetArchitectureResponse struct {
 	ArchitectureList []*Architecture `json:"architecture_list,omitempty"`
 }
 
