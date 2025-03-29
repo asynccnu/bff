@@ -299,13 +299,17 @@ definitions:
         type: string
       architecture_name:
         type: string
+      base_floor:
+        type: string
+      top_floor:
+        type: string
     type: object
   elecprice.CancelStandardRequest:
     properties:
       room_id:
         type: string
     type: object
-  elecprice.GetAIDandNameResponse:
+  elecprice.GetArchitectureResponse:
     properties:
       architecture_list:
         items:
@@ -365,13 +369,11 @@ definitions:
     type: object
   feed.ChangeFeedAllowListReq:
     properties:
-      air_conditioner:
+      energy:
         type: boolean
       grade:
         type: boolean
       holiday:
-        type: boolean
-      light:
         type: boolean
       muxi:
         type: boolean
@@ -407,13 +409,11 @@ definitions:
     type: object
   feed.GetFeedAllowListResp:
     properties:
-      air_conditioner:
+      energy:
         type: boolean
       grade:
         type: boolean
       holiday:
-        type: boolean
-      light:
         type: boolean
       muxi:
         type: boolean
@@ -1375,9 +1375,9 @@ paths:
       summary: 取消电费提醒标准
       tags:
       - 电费
-  /elecprice/getAIDandName:
+  /elecprice/getArchitecture:
     get:
-      description: 通过区域获取楼栋和房间号
+      description: 通过区域获取楼栋信息
       parameters:
       - in: query
         name: area_name
@@ -1392,7 +1392,7 @@ paths:
             - $ref: '#/definitions/web.Response'
             - properties:
                 msg:
-                  $ref: '#/definitions/elecprice.GetAIDandNameResponse'
+                  $ref: '#/definitions/elecprice.GetArchitectureResponse'
               type: object
         "500":
           description: 系统异常
@@ -1403,7 +1403,7 @@ paths:
                 msg:
                   type: string
               type: object
-      summary: 获取楼栋和房间号
+      summary: 获取楼栋信息
       tags:
       - 电费
   /elecprice/getPrice:

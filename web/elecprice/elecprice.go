@@ -7,6 +7,8 @@ import (
 	"github.com/asynccnu/bff/web"
 	"github.com/asynccnu/bff/web/ijwt"
 	"github.com/gin-gonic/gin"
+	"sort"
+	"strconv"
 )
 
 type ElecPriceHandler struct {
@@ -22,7 +24,7 @@ func NewElecPriceHandler(elecPriceClient elecpricev1.ElecpriceServiceClient,
 func (h *ElecPriceHandler) RegisterRoutes(s *gin.RouterGroup, authMiddleware gin.HandlerFunc) {
 	sg := s.Group("/elecprice")
 	{
-		sg.GET("/getAIDandName", authMiddleware, ginx.WrapClaimsAndReq(h.GetAIDandName))
+		sg.GET("/getArchitecture", authMiddleware, ginx.WrapClaimsAndReq(h.GetArchitecture))
 		sg.GET("/getRoomInfo", authMiddleware, ginx.WrapClaimsAndReq(h.GetRoomInfo))
 		sg.GET("/getPrice", authMiddleware, ginx.WrapClaimsAndReq(h.GetPrice))
 
@@ -32,30 +34,43 @@ func (h *ElecPriceHandler) RegisterRoutes(s *gin.RouterGroup, authMiddleware gin
 	}
 }
 
-// @Summary 获取楼栋和房间号
-// @Description 通过区域获取楼栋和房间号
+// @Summary 获取楼栋信息
+// @Description 通过区域获取楼栋信息
 // @Tags 电费
 // @Produce json
-// @Param request query elecprice.GetAIDandNameRequest true "设置电费提醒请求参数"
-// @Success 200 {object} web.Response{msg=elecprice.GetAIDandNameResponse} "设置成功的返回信息"
+// @Param request query elecprice.GetArchitectureRequest true "设置电费提醒请求参数"
+// @Success 200 {object} web.Response{msg=elecprice.GetArchitectureResponse} "设置成功的返回信息"
 // @Failure 500 {object} web.Response{msg=string} "系统异常"
-// @Router /elecprice/getAIDandName [get]
-func (h *ElecPriceHandler) GetAIDandName(ctx *gin.Context, req GetAIDandNameRequest, uc ijwt.UserClaims) (web.Response, error) {
-	res, err := h.ElecPriceClient.GetAIDandName(ctx, &elecpricev1.GetAIDandNameRequest{
+// @Router /elecprice/getArchitecture [get]
+func (h *ElecPriceHandler) GetArchitecture(ctx *gin.Context, req GetArchitectureRequest, uc ijwt.UserClaims) (web.Response, error) {
+	res, err := h.ElecPriceClient.GetArchitecture(ctx, &elecpricev1.GetArchitectureRequest{
 		AreaName: req.AreaName,
 	})
 	if err != nil {
-		return web.Response{}, errs.ELECPRICE_SET_STANDARD_ERROR(err)
+		return web.Response{}, errs.BAD_ENTITY_ERROR(err)
 	}
 	var architectureList []*Architecture
 	for _, r := range res.ArchitectureList {
 		architectureList = append(architectureList, &Architecture{
 			ArchitectureName: r.ArchitectureName,
 			ArchitectureID:   r.ArchitectureID,
+			BaseFloor:        r.BaseFloor,
+			TopFloor:         r.TopFloor,
 		})
 	}
+
+	sort.Slice(architectureList, func(i, j int) bool {
+		idI, errI := strconv.Atoi(architectureList[i].ArchitectureID)
+		idJ, errJ := strconv.Atoi(architectureList[j].ArchitectureID)
+
+		if errI == nil && errJ == nil {
+			return idI < idJ
+		}
+		return architectureList[i].ArchitectureID < architectureList[j].ArchitectureID
+	})
+
 	return web.Response{
-		Data: GetAIDandNameResponse{
+		Data: GetArchitectureResponse{
 			ArchitectureList: architectureList,
 		},
 	}, nil
@@ -84,6 +99,17 @@ func (h *ElecPriceHandler) GetRoomInfo(ctx *gin.Context, req GetRoomInfoRequest,
 			RoomName: r.RoomName,
 		})
 	}
+
+	sort.Slice(roomList, func(i, j int) bool {
+		idI, errI := strconv.Atoi(roomList[i].RoomID)
+		idJ, errJ := strconv.Atoi(roomList[j].RoomID)
+
+		if errI == nil && errJ == nil {
+			return idI < idJ
+		}
+		return roomList[i].RoomID < roomList[j].RoomID
+	})
+
 	return web.Response{
 		Data: GetRoomInfoResponse{
 			RoomList: roomList,
