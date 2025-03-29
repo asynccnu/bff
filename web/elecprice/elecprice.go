@@ -28,9 +28,9 @@ func (h *ElecPriceHandler) RegisterRoutes(s *gin.RouterGroup, authMiddleware gin
 		sg.GET("/getRoomInfo", authMiddleware, ginx.WrapClaimsAndReq(h.GetRoomInfo))
 		sg.GET("/getPrice", authMiddleware, ginx.WrapClaimsAndReq(h.GetPrice))
 
-		sg.POST("/setStandard", authMiddleware, ginx.WrapClaimsAndReq(h.SetStandard))
+		sg.PUT("/setStandard", authMiddleware, ginx.WrapClaimsAndReq(h.SetStandard))
 		sg.GET("/getStandardList", authMiddleware, ginx.WrapClaimsAndReq(h.GetStandardList))
-		sg.POST("/cancelStandard", authMiddleware, ginx.WrapClaimsAndReq(h.CancelStandard))
+		sg.DELETE("/cancelStandard", authMiddleware, ginx.WrapClaimsAndReq(h.CancelStandard))
 	}
 }
 
@@ -152,7 +152,7 @@ func (h *ElecPriceHandler) GetPrice(ctx *gin.Context, req GetPriceRequest, uc ij
 // @Param request body elecprice.SetStandardRequest true "设置电费提醒请求参数"
 // @Success 200 {object} web.Response{msg=string} "设置成功的返回信息"
 // @Failure 500 {object} web.Response{msg=string} "系统异常"
-// @Router /elecprice/setStandard [post]
+// @Router /elecprice/setStandard [put]
 func (h *ElecPriceHandler) SetStandard(ctx *gin.Context, req SetStandardRequest, uc ijwt.UserClaims) (web.Response, error) {
 	_, err := h.ElecPriceClient.SetStandard(ctx, &elecpricev1.SetStandardRequest{
 		StudentId: uc.StudentId,
@@ -209,7 +209,7 @@ func (h *ElecPriceHandler) GetStandardList(ctx *gin.Context, req GetStandardList
 // @Param request body elecprice.CancelStandardRequest true "取消电费提醒请求参数"
 // @Success 200 {object} web.Response{msg=string} "取消成功的返回信息"
 // @Failure 500 {object} web.Response{msg=string} "系统异常"
-// @Router /elecprice/cancelStandard [post]
+// @Router /elecprice/cancelStandard [delete]
 func (h *ElecPriceHandler) CancelStandard(ctx *gin.Context, req CancelStandardRequest, uc ijwt.UserClaims) (web.Response, error) {
 	_, err := h.ElecPriceClient.CancelStandard(ctx, &elecpricev1.CancelStandardRequest{
 		StudentId: uc.StudentId,
