@@ -1340,7 +1340,7 @@ paths:
       tags:
       - 部门
   /elecprice/cancelStandard:
-    post:
+    delete:
       consumes:
       - application/json
       description: 取消自己订阅的电费提醒
@@ -1499,7 +1499,7 @@ paths:
       tags:
       - 电费
   /elecprice/setStandard:
-    post:
+    put:
       consumes:
       - application/json
       description: 根据区域、楼栋和房间号设置电费提醒的金额标准
