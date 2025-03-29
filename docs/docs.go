@@ -945,7 +945,7 @@ const docTemplate = `{
             }
         },
         "/elecprice/cancelStandard": {
-            "post": {
+            "delete": {
                 "description": "取消自己订阅的电费提醒",
                 "consumes": [
                     "application/json"
@@ -1235,7 +1235,7 @@ const docTemplate = `{
             }
         },
         "/elecprice/setStandard": {
-            "post": {
+            "put": {
                 "description": "根据区域、楼栋和房间号设置电费提醒的金额标准",
                 "consumes": [
                     "application/json"
